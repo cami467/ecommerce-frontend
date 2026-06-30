@@ -1,8 +1,19 @@
+import { Routes, Route } from 'react-router-dom'
+import { ProtectedRoute } from './routes/ProtectedRoute'
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import MiCuentaPage from './pages/MiCuentaPage'
+
 function App() {
   return (
-    <div className="bg-blue-600 text-white p-4 text-2xl font-bold">
-      Tailwind esta funcionando
-    </div>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+
+      <Route element={<ProtectedRoute />}>
+        <Route path="/mi-cuenta" element={<MiCuentaPage />} />
+      </Route>
+    </Routes>
   )
 }
 
