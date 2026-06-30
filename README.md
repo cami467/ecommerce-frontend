@@ -1,75 +1,62 @@
-# React + TypeScript + Vite
+# E-Commerce Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Cliente web (SPA) para consumir la API REST del backend de e-commerce desarrollado en Django REST Framework.
 
-Currently, two official plugins are available:
+## Stack tecnológico
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 18 + TypeScript
+- Vite
+- React Router DOM (enrutamiento)
+- TanStack Query (manejo de estado de servidor, cache, mutaciones)
+- Zustand (estado global de autenticación)
+- Axios (cliente HTTP)
+- Tailwind CSS v4 (estilos)
 
-## React Compiler
+## Requisitos previos
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 18 o superior
+- El backend de Django corriendo en paralelo (repositorio separado: `Proyecto_E-commerce`)
 
-## Expanding the ESLint configuration
+## Instalación
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+\`\`\`bash
+npm install
+\`\`\`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Variables de entorno
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Crear un archivo `.env.development` en la raíz con:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+\`\`\`
+VITE_API_URL=http://127.0.0.1:8000/api
+\`\`\`
 
-```
+## Ejecución en desarrollo
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. Levantar el backend Django en otra terminal:
+   \`\`\`bash
+   python manage.py runserver
+   \`\`\`
+2. Levantar el frontend:
+   \`\`\`bash
+   npm run dev
+   \`\`\`
+3. Abrir `http://localhost:5173`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Estructura del proyecto
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+\`\`\`
+src/
+├── api/          # Cliente Axios y funciones de llamada a la API
+├── types/        # Tipos TypeScript que reflejan los serializers del backend
+├── store/        # Estado global (Zustand)
+├── pages/        # Vistas de la aplicación
+├── components/   # Componentes reutilizables
+├── routes/       # Configuración de rutas y rutas protegidas
+└── hooks/        # Custom hooks
+\`\`\`
 
-```
+
+## Estado del proyecto
+
+🚧 En desarrollo.
