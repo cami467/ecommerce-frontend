@@ -43,20 +43,9 @@ VITE_API_URL=http://127.0.0.1:8000/api
    \`\`\`
 3. Abrir `http://localhost:5173`
 
-## Estructura del proyecto
 
-\`\`\`
-src/
-├── api/          # Cliente Axios y funciones de llamada a la API
-├── types/        # Tipos TypeScript que reflejan los serializers del backend
-├── store/        # Estado global (Zustand)
-├── pages/        # Vistas de la aplicación
-├── components/   # Componentes reutilizables
-├── routes/       # Configuración de rutas y rutas protegidas
-└── hooks/        # Custom hooks
-\`\`\`
 
 
 ## Estado del proyecto
 
-🚧 En desarrollo.
+En desarrollo.
