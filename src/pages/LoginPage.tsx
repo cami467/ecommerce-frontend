@@ -8,7 +8,7 @@ function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [cargando, setCargando] = useState(false)
@@ -19,11 +19,11 @@ function LoginPage() {
     setCargando(true)
 
     try {
-      await login({ username, password })
+      await login({ email: email.trim().toLowerCase(), password })
       navigate('/mi-cuenta')
     } catch (err) {
       if (isAxiosError(err) && err.response?.status === 401) {
-        setError('Usuario o contraseña incorrectos.')
+        setError('Email o contraseña incorrectos.')
       } else {
         setError('Ocurrio un error al iniciar sesion. Intenta de nuevo.')
       }
@@ -47,14 +47,15 @@ function LoginPage() {
         )}
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1" htmlFor="username">
-            Usuario
+          <label className="block text-sm font-medium mb-1" htmlFor="email">
+            Email
           </label>
           <input
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
             required
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -69,6 +70,7 @@ function LoginPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
             required
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />

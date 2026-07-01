@@ -3,7 +3,7 @@ import { tokenStorage } from './tokenStorage'
 import { useAuthStore } from '../store/authStore'
 
 interface LoginCredenciales {
-  username: string
+  email: string
   password: string
 }
 
