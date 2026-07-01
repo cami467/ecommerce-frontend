@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { isAxiosError } from 'axios'
 
@@ -81,6 +81,12 @@ function LoginPage() {
         >
           {cargando ? 'Ingresando...' : 'Ingresar'}
         </button>
+        <p className="text-sm text-center mt-4">
+          No tenes cuenta?{' '}
+          <Link to="/registro" className="text-blue-600 hover:underline">
+            Registrate
+          </Link>
+        </p>
       </form>
     </div>
   )
