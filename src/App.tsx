@@ -5,10 +5,13 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import MiCuentaPage from './pages/MiCuentaPage'
 import RegistroPage from './pages/RegistroPage'
+import { AuthBootstrap } from './components/AuthBootstrap'
+
 
 function App() {
   return (
     <>
+     <AuthBootstrap />
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
