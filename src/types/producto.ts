@@ -22,17 +22,16 @@ export interface VarianteProducto {
 }
 
 export interface Producto {
-  id: number
+  id: string
   nombre: string
   slug: string
-  descripcion: string
-  precio: string
-  precio_final: string
-  tiene_descuento: boolean
+  categoria_nombre: string
+  precio_base: string
   porcentaje_descuento: string
-  inventario: number
-  esta_disponible: boolean
-  categoria: Categoria
-  imagenes: ProductoImagen[]
-  variantes: VarianteProducto[]
+  precio_con_descuento: string
+  tasa_iva: string
+  monto_iva_incluido: string
+  imagen_principal: string | null
+  es_destacado: boolean
+  esta_activo: boolean
 }
