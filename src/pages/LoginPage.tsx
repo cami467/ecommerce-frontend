@@ -19,11 +19,13 @@ function LoginPage() {
     setCargando(true)
 
     try {
-      await login({ email: email.trim().toLowerCase(), password })
+      await login({ email, password })
       navigate('/mi-cuenta')
     } catch (err) {
       if (isAxiosError(err) && err.response?.status === 401) {
-        setError('Email o contraseña incorrectos.')
+        setError('Correo electronico o contraseña incorrectos.')
+      } else if (isAxiosError(err) && err.response?.status === 429) {
+        setError('Demasiados intentos. Espera un momento e intenta de nuevo.')
       } else {
         setError('Ocurrio un error al iniciar sesion. Intenta de nuevo.')
       }
@@ -55,8 +57,8 @@ function LoginPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
             required
+            autoComplete="email"
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -70,8 +72,8 @@ function LoginPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
             required
+            autoComplete="current-password"
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

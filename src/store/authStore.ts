@@ -1,10 +1,11 @@
 import { create } from 'zustand'
 
-interface Usuario {
+export interface Usuario {
   id: number
-  username: string
   email: string
-  nombre_completo: string
+  first_name: string
+  last_name: string
+  nombre_completo: string | null
   telefono: string | null
   avatar: string | null
   date_joined: string

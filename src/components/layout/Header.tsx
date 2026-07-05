@@ -10,6 +10,8 @@ export function Header() {
     navigate('/login')
   }
 
+  const nombreUsuario = usuario?.nombre_completo || usuario?.email || 'Mi cuenta'
+
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
       <Link to="/" className="text-xl font-bold">
@@ -20,7 +22,7 @@ export function Header() {
         {estaAutenticado ? (
           <>
             <Link to="/mi-cuenta" className="text-sm text-gray-700 hover:underline">
-              {usuario?.username ?? 'Mi cuenta'}
+              {nombreUsuario}
             </Link>
             <button
               onClick={handleLogout}

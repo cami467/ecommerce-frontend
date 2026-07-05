@@ -1,6 +1,6 @@
 import apiClient from './client'
 import { tokenStorage } from './tokenStorage'
-import { useAuthStore } from '../store/authStore'
+import { useAuthStore, type Usuario } from '../store/authStore'
 
 interface LoginCredenciales {
   email: string
@@ -10,30 +10,39 @@ interface LoginCredenciales {
 interface LoginResponse {
   access: string
   refresh: string
+  usuario: Usuario
 }
 
 interface RegistroDatos {
-  username: string
   email: string
   password: string
   password2: string
+  first_name?: string
+  last_name?: string
   telefono?: string
 }
 
 export async function login(credenciales: LoginCredenciales): Promise<void> {
-  const response = await apiClient.post<LoginResponse>('/token/', credenciales)
-  const { access, refresh } = response.data
+  const response = await apiClient.post<LoginResponse>('/token/', {
+    email: credenciales.email.trim().toLowerCase(),
+    password: credenciales.password,
+  })
+
+  const { access, refresh, usuario } = response.data
 
   useAuthStore.getState().setAccessToken(access)
+  useAuthStore.getState().setUsuario(usuario)
   tokenStorage.setRefreshToken(refresh)
-
-  // El login no devuelve datos del usuario, asi que los pedimos aparte
-  const perfilResponse = await apiClient.get('/usuarios/perfil/')
-  useAuthStore.getState().setUsuario(perfilResponse.data)
 }
 
 export async function registro(datos: RegistroDatos): Promise<void> {
-  await apiClient.post('/usuarios/registro/', datos)
+  await apiClient.post('/usuarios/registro/', {
+    ...datos,
+    email: datos.email.trim().toLowerCase(),
+    first_name: datos.first_name?.trim() || undefined,
+    last_name: datos.last_name?.trim() || undefined,
+    telefono: datos.telefono?.trim() || undefined,
+  })
 }
 
 export async function logout(): Promise<void> {

@@ -35,7 +35,6 @@ function RegistroPage() {
 
     try {
       await registro({
-        username,
         email,
         password,
         password2,
