@@ -1,4 +1,4 @@
-import { ProductCard } from '../components/producto/ProductCard'
+import { ProductCard } from '../components/productos/ProductCard'
 import { useProductos } from '../hooks/useProductos'
 
 export function ProductosPage() {
