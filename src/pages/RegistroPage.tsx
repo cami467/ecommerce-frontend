@@ -113,15 +113,14 @@ function RegistroPage() {
       } else {
         setErrorGeneral("No se pudo crear la cuenta. Intenta nuevamente.");
       }
+    } finally {
+      setCargando(false);
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
-      >
+      <div className="mx-auto w-full max-w-md rounded-lg bg-white p-6 shadow">
         <h1 className="text-2xl font-bold mb-6">Crear cuenta</h1>
 
         {errorGeneral && (
@@ -135,218 +134,283 @@ function RegistroPage() {
             {errores.non_field_errors[0]}
           </div>
         )}
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1" htmlFor="firstName">
-            Nombre
-          </label>
-          <input
-            id="firstName"
-            type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            onBlur={() =>
-              setCamposTocados({ ...camposTocados, firstName: true })
-            }
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {errorNombre && (
-            <p className="text-red-600 text-xs mt-1">{errorNombre}</p>
-          )}
-          {firstName && !firstNameValido && (
-            <p className="text-red-600 text-xs mt-1">
-              El nombre solo puede contener letras, espacios, guiones o
-              apóstrofes.
-            </p>
-          )}
-          {errores.first_name && (
-            <p className="text-red-600 text-xs mt-1">{errores.first_name[0]}</p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1" htmlFor="lastName">
-            Apellido
-          </label>
-          <input
-            id="lastName"
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            onBlur={() =>
-              setCamposTocados({ ...camposTocados, lastName: true })
-            }
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {errorApellido && (
-            <p className="text-red-600 text-xs mt-1">{errorApellido}</p>
-          )}
-          {lastName && !lastNameValido && (
-            <p className="text-red-600 text-xs mt-1">
-              El apellido solo puede contener letras, espacios, guiones o
-              apóstrofes.
-            </p>
-          )}
-          {errores.last_name && (
-            <p className="text-red-600 text-xs mt-1">{errores.last_name[0]}</p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1" htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {email && !emailValido && (
-            <p className="text-red-600 text-xs mt-1">
-              Correo electrónico inválido.
-            </p>
-          )}
-          {errores.email && (
-            <p className="text-red-600 text-xs mt-1">{errores.email[0]}</p>
-          )}
-          {getBackendFieldError(erroresBackend, "email") && (
-            <p className="text-red-600 text-xs mt-1">
-              {getBackendFieldError(erroresBackend, "email")}
-            </p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1" htmlFor="telefono">
-            Teléfono (opcional)
-          </label>
-          <input
-            id="telefono"
-            type="text"
-            inputMode="numeric"
-            value={telefono}
-            onChange={(e) => setTelefono(sanitizePhone(e.target.value))}
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {telefono && !telefonoValido && (
-            <p className="text-red-600 text-xs mt-1">
-              El teléfono debe tener entre 6 y 15 números.
-            </p>
-          )}
-          {errores.telefono && (
-            <p className="text-red-600 text-xs mt-1">{errores.telefono[0]}</p>
-          )}
-          {getBackendFieldError(erroresBackend, "telefono") && (
-            <p className="text-red-600 text-xs mt-1">
-              {getBackendFieldError(erroresBackend, "telefono")}
-            </p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1" htmlFor="password">
-            Contraseña
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <ul className="text-xs mt-2 space-y-1">
-            <li
-              className={
-                passwordRules.minLength ? "text-green-600" : "text-gray-500"
-              }
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div>
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="firstName"
             >
-              ✓ mínimo 10 caracteres
-            </li>
-            <li
-              className={
-                passwordRules.uppercase ? "text-green-600" : "text-gray-500"
+              Nombre
+            </label>
+            <input
+              id="firstName"
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              onBlur={() =>
+                setCamposTocados({ ...camposTocados, firstName: true })
               }
-            >
-              ✓ una mayúscula
-            </li>
-            <li
-              className={
-                passwordRules.lowercase ? "text-green-600" : "text-gray-500"
-              }
-            >
-              ✓ una minúscula
-            </li>
-            <li
-              className={
-                passwordRules.number ? "text-green-600" : "text-gray-500"
-              }
-            >
-              ✓ un número
-            </li>
-            <li
-              className={
-                passwordRules.specialChar ? "text-green-600" : "text-gray-500"
-              }
-            >
-              ✓ un carácter especial
-            </li>
-          </ul>
-          {errores.password && (
-            <p className="text-red-600 text-xs mt-1">{errores.password[0]}</p>
-          )}
-          {getBackendFieldError(erroresBackend, "password") && (
-            <p className="text-red-600 text-xs mt-1">
-              {getBackendFieldError(erroresBackend, "password")}
-            </p>
-          )}
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-sm font-medium mb-1" htmlFor="password2">
-            Confirmar contraseña
-          </label>
-          <input
-            id="password2"
-            type="password"
-            value={password2}
-            onChange={(e) => setPassword2(e.target.value)}
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {password2 && !passwordCoincide && (
-            <p className="text-red-600 text-xs mt-1">
-              Las contraseñas no coinciden.
-            </p>
-          )}
-          {errores.password2 && (
-            <p className="text-red-600 text-xs mt-1">{errores.password2[0]}</p>
-          )}
-        </div>
-        {mensajeExito && (
-          <div className="mb-4 rounded bg-green-50 p-3 text-sm text-green-700">
-            {mensajeExito}
+              required
+              autoComplete="given-name"
+              aria-invalid={!!errorNombre}
+              aria-describedby="firstName-error"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errorNombre && (
+              <p id="firstName-error" className="text-red-600 text-xs mt-1">
+                {errorNombre}
+              </p>
+            )}
+            {firstName && !firstNameValido && (
+              <p className="text-red-600 text-xs mt-1">
+                El nombre solo puede contener letras, espacios, guiones o
+                apóstrofes.
+              </p>
+            )}
+            {errores.first_name && (
+              <p className="text-red-600 text-xs mt-1">
+                {errores.first_name[0]}
+              </p>
+            )}
           </div>
-        )}
-        <button
-          type="submit"
-          disabled={cargando || !formularioValido}
-          className="w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {cargando ? "Creando cuenta..." : "Crear cuenta"}
-        </button>
-        <p className="text-sm text-center mt-4">
-          Ya tenés cuenta?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline">
-            Inicia sesión
-          </Link>
-        </p>
-      </form>
+
+          <div>
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="lastName"
+            >
+              Apellido
+            </label>
+            <input
+              id="lastName"
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              onBlur={() =>
+                setCamposTocados({ ...camposTocados, lastName: true })
+              }
+              required
+              autoComplete="family-name"
+              aria-invalid={
+                !!errorApellido || (lastName.length > 0 && !lastNameValido)
+              }
+              aria-describedby={
+                errorApellido
+                  ? "lastName-error"
+                  : lastName && !lastNameValido
+                    ? "lastName-format-error"
+                    : undefined
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errorApellido && (
+              <p id="lastName-error" className="text-red-600 text-xs mt-1">
+                {errorApellido}
+              </p>
+            )}
+            {lastName && !lastNameValido && (
+              <p className="text-red-600 text-xs mt-1">
+                El apellido solo puede contener letras, espacios, guiones o
+                apóstrofes.
+              </p>
+            )}
+            {errores.last_name && (
+              <p className="text-red-600 text-xs mt-1">
+                {errores.last_name[0]}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="email">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              aria-invalid={email.length > 0 && !emailValido}
+              aria-describedby={
+                email && !emailValido ? "email-error" : undefined
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {email && !emailValido && (
+              <p className="text-red-600 text-xs mt-1">
+                Correo electrónico inválido.
+              </p>
+            )}
+            {errores.email && (
+              <p className="text-red-600 text-xs mt-1">{errores.email[0]}</p>
+            )}
+            {getBackendFieldError(erroresBackend, "email") && (
+              <p className="text-red-600 text-xs mt-1">
+                {getBackendFieldError(erroresBackend, "email")}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="telefono"
+            >
+              Teléfono (opcional)
+            </label>
+            <input
+              id="telefono"
+              type="text"
+              inputMode="numeric"
+              value={telefono}
+              onChange={(e) => setTelefono(sanitizePhone(e.target.value))}
+              autoComplete="tel"
+              aria-invalid={telefono.length > 0 && !telefonoValido}
+              aria-describedby={
+                telefono && !telefonoValido ? "telefono-error" : undefined
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {telefono && !telefonoValido && (
+              <p className="text-red-600 text-xs mt-1">
+                El teléfono debe tener entre 6 y 15 números.
+              </p>
+            )}
+            {errores.telefono && (
+              <p className="text-red-600 text-xs mt-1">{errores.telefono[0]}</p>
+            )}
+            {getBackendFieldError(erroresBackend, "telefono") && (
+              <p className="text-red-600 text-xs mt-1">
+                {getBackendFieldError(erroresBackend, "telefono")}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="password"
+            >
+              Contraseña
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="new-password"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <p className="mt-1 text-xs text-gray-500">
+              Usá al menos 10 caracteres, una mayúscula, una minúscula, un
+              número y un símbolo.
+            </p>
+
+            <ul className="text-xs mt-2 space-y-1">
+              <li
+                className={
+                  passwordRules.minLength ? "text-green-600" : "text-gray-500"
+                }
+              >
+                ✓ mínimo 10 caracteres
+              </li>
+              <li
+                className={
+                  passwordRules.uppercase ? "text-green-600" : "text-gray-500"
+                }
+              >
+                ✓ una mayúscula
+              </li>
+              <li
+                className={
+                  passwordRules.lowercase ? "text-green-600" : "text-gray-500"
+                }
+              >
+                ✓ una minúscula
+              </li>
+              <li
+                className={
+                  passwordRules.number ? "text-green-600" : "text-gray-500"
+                }
+              >
+                ✓ un número
+              </li>
+              <li
+                className={
+                  passwordRules.specialChar ? "text-green-600" : "text-gray-500"
+                }
+              >
+                ✓ un carácter especial
+              </li>
+            </ul>
+            {errores.password && (
+              <p className="text-red-600 text-xs mt-1">{errores.password[0]}</p>
+            )}
+            {getBackendFieldError(erroresBackend, "password") && (
+              <p className="text-red-600 text-xs mt-1">
+                {getBackendFieldError(erroresBackend, "password")}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="password2"
+            >
+              Confirmar contraseña
+            </label>
+            <input
+              id="password2"
+              type="password"
+              value={password2}
+              onChange={(e) => setPassword2(e.target.value)}
+              required
+              autoComplete="new-password"
+              aria-invalid={password2.length > 0 && !passwordCoincide}
+              aria-describedby={
+                password2 && !passwordCoincide ? "password2-error" : undefined
+              }
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {password2 && !passwordCoincide && (
+              <p className="text-red-600 text-xs mt-1">
+                Las contraseñas no coinciden.
+              </p>
+            )}
+            {errores.password2 && (
+              <p className="text-red-600 text-xs mt-1">
+                {errores.password2[0]}
+              </p>
+            )}
+          </div>
+
+          {mensajeExito && (
+            <div className="mb-4 rounded bg-green-50 p-3 text-sm text-green-700">
+              {mensajeExito}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={cargando || !formularioValido}
+            className="w-full rounded bg-blue-600 px-4 py-2 text-white disabled:bg-blue-300 disabled:cursor-not-allowed"
+          >
+            {cargando ? "Creando cuenta..." : "Crear cuenta"}
+          </button>
+
+          <p className="text-sm text-center mt-4">
+            Ya tenés cuenta?{" "}
+            <Link to="/login" className="text-blue-600 hover:underline">
+              Inicia sesión
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }
