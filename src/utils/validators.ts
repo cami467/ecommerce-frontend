@@ -46,3 +46,25 @@ export function isStrongPassword(password: string): boolean {
   const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   return regex.test(password);
 }
+
+export function validatePersonName(value: string, fieldName: string): string | null {
+  const normalized = normalizeSpaces(value)
+
+  if (!normalized) {
+    return `${fieldName} es obligatorio.`
+  }
+
+  if (normalized.length < 2) {
+    return `${fieldName} debe tener al menos 2 caracteres.`
+  }
+
+  if (normalized.length > 50) {
+    return `${fieldName} no puede superar 50 caracteres.`
+  }
+
+  if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü' -]+$/.test(normalized)) {
+    return `${fieldName} solo puede contener letras, espacios, guiones o apóstrofes.`
+  }
+
+  return null
+}

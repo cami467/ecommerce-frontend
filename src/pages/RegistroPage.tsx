@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { isAxiosError } from 'axios'
+import { useMemo, useState } from "react";
+import type { FormEvent } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { isAxiosError } from "axios";
 import {
   isPasswordStrong,
   isValidEmail,
@@ -10,41 +10,61 @@ import {
   normalizeSpaces,
   sanitizePhone,
   validatePasswordRules,
-} from '../utils/validators'
+  validatePersonName,
+} from "../utils/validators";
 
 interface ErroresCampo {
-  email?: string[]
-  password?: string[]
-  password2?: string[]
-  telefono?: string[]
-  first_name?: string[]
-  last_name?: string[]
-  non_field_errors?: string[]
+  email?: string[];
+  password?: string[];
+  password2?: string[];
+  telefono?: string[];
+  first_name?: string[];
+  last_name?: string[];
+  non_field_errors?: string[];
 }
 
 function RegistroPage() {
-  const { registro } = useAuth()
-  const navigate = useNavigate()
+  const { registro } = useAuth();
+  const navigate = useNavigate();
 
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [password2, setPassword2] = useState('')
-  const [telefono, setTelefono] = useState('')
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
+  const [telefono, setTelefono] = useState("");
 
-  const [errores, setErrores] = useState<ErroresCampo>({})
-  const [errorGeneral, setErrorGeneral] = useState<string | null>(null)
-  const [cargando, setCargando] = useState(false)
+  const [camposTocados, setCamposTocados] = useState({
+    firstName: false,
+    lastName: false,
+    email: false,
+    password: false,
+    password2: false,
+  });
 
-  const passwordRules = useMemo(() => validatePasswordRules(password), [password])
+  const [errores, setErrores] = useState<ErroresCampo>({});
+  const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
+  const [cargando, setCargando] = useState(false);
 
-  const firstNameValido = firstName.length > 0 && isValidPersonName(firstName)
-  const lastNameValido = lastName.length > 0 && isValidPersonName(lastName)
-  const emailValido = isValidEmail(email)
-  const passwordValida = isPasswordStrong(password)
-  const passwordCoincide = password.length > 0 && password === password2
-  const telefonoValido = telefono.length === 0 || /^\d{6,15}$/.test(telefono)
+  const passwordRules = useMemo(
+    () => validatePasswordRules(password),
+    [password],
+  );
+
+  const firstNameValido = firstName.length > 0 && isValidPersonName(firstName);
+  const lastNameValido = lastName.length > 0 && isValidPersonName(lastName);
+  const emailValido = isValidEmail(email);
+  const passwordValida = isPasswordStrong(password);
+  const passwordCoincide = password.length > 0 && password === password2;
+  const telefonoValido = telefono.length === 0 || /^\d{6,15}$/.test(telefono);
+
+  const errorNombre = camposTocados.firstName
+    ? validatePersonName(firstName, "El nombre")
+    : null;
+
+  const errorApellido = camposTocados.lastName
+    ? validatePersonName(lastName, "El apellido")
+    : null;
 
   const formularioValido =
     firstNameValido &&
@@ -52,18 +72,18 @@ function RegistroPage() {
     emailValido &&
     passwordValida &&
     passwordCoincide &&
-    telefonoValido
+    telefonoValido;
 
   async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!formularioValido || cargando) {
-      return
+      return;
     }
 
-    setErrores({})
-    setErrorGeneral(null)
-    setCargando(true)
+    setErrores({});
+    setErrorGeneral(null);
+    setCargando(true);
 
     try {
       await registro({
@@ -73,16 +93,16 @@ function RegistroPage() {
         password,
         password2,
         telefono: telefono || undefined,
-      })
-      navigate('/login')
+      });
+      navigate("/login");
     } catch (err) {
       if (isAxiosError(err) && err.response?.status === 400) {
-        setErrores(err.response.data as ErroresCampo)
+        setErrores(err.response.data as ErroresCampo);
       } else {
-        setErrorGeneral('Ocurrió un error al registrarte. Intenta de nuevo.')
+        setErrorGeneral("Ocurrió un error al registrarte. Intenta de nuevo.");
       }
     } finally {
-      setCargando(false)
+      setCargando(false);
     }
   }
 
@@ -115,12 +135,19 @@ function RegistroPage() {
             type="text"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
+            onBlur={() =>
+              setCamposTocados({ ...camposTocados, firstName: true })
+            }
             required
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          {errorNombre && (
+            <p className="text-red-600 text-xs mt-1">{errorNombre}</p>
+          )}
           {firstName && !firstNameValido && (
             <p className="text-red-600 text-xs mt-1">
-              El nombre solo puede contener letras, espacios, guiones o apóstrofes.
+              El nombre solo puede contener letras, espacios, guiones o
+              apóstrofes.
             </p>
           )}
           {errores.first_name && (
@@ -137,12 +164,19 @@ function RegistroPage() {
             type="text"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
+            onBlur={() =>
+              setCamposTocados({ ...camposTocados, lastName: true })
+            }
             required
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          {errorApellido && (
+            <p className="text-red-600 text-xs mt-1">{errorApellido}</p>
+          )}
           {lastName && !lastNameValido && (
             <p className="text-red-600 text-xs mt-1">
-              El apellido solo puede contener letras, espacios, guiones o apóstrofes.
+              El apellido solo puede contener letras, espacios, guiones o
+              apóstrofes.
             </p>
           )}
           {errores.last_name && (
@@ -163,7 +197,9 @@ function RegistroPage() {
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {email && !emailValido && (
-            <p className="text-red-600 text-xs mt-1">Correo electrónico inválido.</p>
+            <p className="text-red-600 text-xs mt-1">
+              Correo electrónico inválido.
+            </p>
           )}
           {errores.email && (
             <p className="text-red-600 text-xs mt-1">{errores.email[0]}</p>
@@ -205,19 +241,39 @@ function RegistroPage() {
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <ul className="text-xs mt-2 space-y-1">
-            <li className={passwordRules.minLength ? 'text-green-600' : 'text-gray-500'}>
+            <li
+              className={
+                passwordRules.minLength ? "text-green-600" : "text-gray-500"
+              }
+            >
               ✓ mínimo 10 caracteres
             </li>
-            <li className={passwordRules.uppercase ? 'text-green-600' : 'text-gray-500'}>
+            <li
+              className={
+                passwordRules.uppercase ? "text-green-600" : "text-gray-500"
+              }
+            >
               ✓ una mayúscula
             </li>
-            <li className={passwordRules.lowercase ? 'text-green-600' : 'text-gray-500'}>
+            <li
+              className={
+                passwordRules.lowercase ? "text-green-600" : "text-gray-500"
+              }
+            >
               ✓ una minúscula
             </li>
-            <li className={passwordRules.number ? 'text-green-600' : 'text-gray-500'}>
+            <li
+              className={
+                passwordRules.number ? "text-green-600" : "text-gray-500"
+              }
+            >
               ✓ un número
             </li>
-            <li className={passwordRules.specialChar ? 'text-green-600' : 'text-gray-500'}>
+            <li
+              className={
+                passwordRules.specialChar ? "text-green-600" : "text-gray-500"
+              }
+            >
               ✓ un carácter especial
             </li>
           </ul>
@@ -239,7 +295,9 @@ function RegistroPage() {
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {password2 && !passwordCoincide && (
-            <p className="text-red-600 text-xs mt-1">Las contraseñas no coinciden.</p>
+            <p className="text-red-600 text-xs mt-1">
+              Las contraseñas no coinciden.
+            </p>
           )}
           {errores.password2 && (
             <p className="text-red-600 text-xs mt-1">{errores.password2[0]}</p>
@@ -251,18 +309,18 @@ function RegistroPage() {
           disabled={cargando || !formularioValido}
           className="w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
+          {cargando ? "Creando cuenta..." : "Crear cuenta"}
         </button>
 
         <p className="text-sm text-center mt-4">
-          Ya tenés cuenta?{' '}
+          Ya tenés cuenta?{" "}
           <Link to="/login" className="text-blue-600 hover:underline">
             Inicia sesión
           </Link>
         </p>
       </form>
     </div>
-  )
+  );
 }
 
-export default RegistroPage
+export default RegistroPage;
