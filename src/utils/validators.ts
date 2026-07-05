@@ -68,3 +68,20 @@ export function validatePersonName(value: string, fieldName: string): string | n
 
   return null
 }
+
+export type BackendFieldErrors = Record<string, string[] | string>
+
+export function getBackendFieldError(
+  errors: BackendFieldErrors | null,
+  field: string
+): string | null {
+  if (!errors || !errors[field]) return null
+
+  const error = errors[field]
+
+  if (Array.isArray(error)) {
+    return error[0] ?? null
+  }
+
+  return error
+}

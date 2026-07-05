@@ -11,6 +11,8 @@ import {
   sanitizePhone,
   validatePasswordRules,
   validatePersonName,
+  getBackendFieldError,
+  type BackendFieldErrors,
 } from "../utils/validators";
 
 interface ErroresCampo {
@@ -45,6 +47,9 @@ function RegistroPage() {
   const [errores, setErrores] = useState<ErroresCampo>({});
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
+  const [erroresBackend, setErroresBackend] =
+    useState<BackendFieldErrors | null>(null);
+  const [mensajeExito, setMensajeExito] = useState("");
 
   const passwordRules = useMemo(
     () => validatePasswordRules(password),
@@ -84,6 +89,8 @@ function RegistroPage() {
     setErrores({});
     setErrorGeneral(null);
     setCargando(true);
+    setErroresBackend(null);
+    setMensajeExito("");
 
     try {
       await registro({
@@ -94,15 +101,18 @@ function RegistroPage() {
         password2,
         telefono: telefono || undefined,
       });
-      navigate("/login");
-    } catch (err) {
-      if (isAxiosError(err) && err.response?.status === 400) {
-        setErrores(err.response.data as ErroresCampo);
+      setMensajeExito(
+        "Cuenta creada correctamente. Redirigiendo al inicio de sesión...",
+      );
+      setTimeout(() => {
+        navigate("/login");
+      }, 1200);
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.data) {
+        setErroresBackend(error.response.data as BackendFieldErrors);
       } else {
-        setErrorGeneral("Ocurrió un error al registrarte. Intenta de nuevo.");
+        setErrorGeneral("No se pudo crear la cuenta. Intenta nuevamente.");
       }
-    } finally {
-      setCargando(false);
     }
   }
 
@@ -204,6 +214,11 @@ function RegistroPage() {
           {errores.email && (
             <p className="text-red-600 text-xs mt-1">{errores.email[0]}</p>
           )}
+          {getBackendFieldError(erroresBackend, "email") && (
+            <p className="text-red-600 text-xs mt-1">
+              {getBackendFieldError(erroresBackend, "email")}
+            </p>
+          )}
         </div>
 
         <div className="mb-4">
@@ -225,6 +240,11 @@ function RegistroPage() {
           )}
           {errores.telefono && (
             <p className="text-red-600 text-xs mt-1">{errores.telefono[0]}</p>
+          )}
+          {getBackendFieldError(erroresBackend, "telefono") && (
+            <p className="text-red-600 text-xs mt-1">
+              {getBackendFieldError(erroresBackend, "telefono")}
+            </p>
           )}
         </div>
 
@@ -280,6 +300,11 @@ function RegistroPage() {
           {errores.password && (
             <p className="text-red-600 text-xs mt-1">{errores.password[0]}</p>
           )}
+          {getBackendFieldError(erroresBackend, "password") && (
+            <p className="text-red-600 text-xs mt-1">
+              {getBackendFieldError(erroresBackend, "password")}
+            </p>
+          )}
         </div>
 
         <div className="mb-6">
@@ -303,7 +328,11 @@ function RegistroPage() {
             <p className="text-red-600 text-xs mt-1">{errores.password2[0]}</p>
           )}
         </div>
-
+        {mensajeExito && (
+          <div className="mb-4 rounded bg-green-50 p-3 text-sm text-green-700">
+            {mensajeExito}
+          </div>
+        )}
         <button
           type="submit"
           disabled={cargando || !formularioValido}
@@ -311,7 +340,6 @@ function RegistroPage() {
         >
           {cargando ? "Creando cuenta..." : "Crear cuenta"}
         </button>
-
         <p className="text-sm text-center mt-4">
           Ya tenés cuenta?{" "}
           <Link to="/login" className="text-blue-600 hover:underline">
