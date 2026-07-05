@@ -4,30 +4,45 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { isAxiosError } from 'axios'
 
+import {
+isValidEmail,
+} from "../utils/validators";
+
+
 function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
+  const [emailTocado, setEmailTocado] = useState(false)
+
+  const emailValido = isValidEmail(email)
+  const formularioValido = emailValido && password.length > 0
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    setError(null)
+
+    if (!formularioValido) return
+
+    setError('')
     setCargando(true)
 
     try {
-      await login({ email, password })
+      await login({
+        email: email.trim().toLowerCase(),
+        password,
+      })
       navigate('/mi-cuenta')
     } catch (err) {
       if (isAxiosError(err) && err.response?.status === 401) {
-        setError('Correo electronico o contraseña incorrectos.')
+        setError('Correo electrónico o contraseña incorrectos.')
       } else if (isAxiosError(err) && err.response?.status === 429) {
         setError('Demasiados intentos. Espera un momento e intenta de nuevo.')
       } else {
-        setError('Ocurrio un error al iniciar sesion. Intenta de nuevo.')
+        setError('Ocurrió un error al iniciar sesión. Intenta de nuevo.')
       }
     } finally {
       setCargando(false)
@@ -39,8 +54,9 @@ function LoginPage() {
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
+        noValidate
       >
-        <h1 className="text-2xl font-bold mb-6">Iniciar sesion</h1>
+        <h1 className="text-2xl font-bold mb-6">Iniciar sesión</h1>
 
         {error && (
           <div className="bg-red-100 text-red-700 text-sm p-3 rounded mb-4">
@@ -57,10 +73,20 @@ function LoginPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onBlur={() => setEmailTocado(true)}
             required
             autoComplete="email"
+            aria-invalid={emailTocado && !emailValido}
+            aria-describedby={
+              emailTocado && email && !emailValido ? 'email-error' : undefined
+            }
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          {emailTocado && email && !emailValido && (
+            <p id="email-error" className="text-red-600 text-xs mt-1">
+              Ingresá un correo electrónico válido.
+            </p>
+          )}
         </div>
 
         <div className="mb-6">
@@ -80,10 +106,10 @@ function LoginPage() {
 
         <button
           type="submit"
-          disabled={cargando}
+          disabled={cargando || !formularioValido}
           className="w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-700 disabled:opacity-50"
         >
-          {cargando ? 'Ingresando...' : 'Ingresar'}
+          {cargando ? 'Ingresando...' : 'Iniciar sesión'}
         </button>
         <p className="text-sm text-center mt-4">
           No tenes cuenta?{' '}
