@@ -1,5 +1,5 @@
-import  apiClient  from './client'
-import type { Producto } from '../types/producto'
+import apiClient from './client'
+import type { Producto, ProductoDetalle } from '../types/producto'
 
 interface ProductosResponse {
   total: number
@@ -15,7 +15,7 @@ export async function obtenerProductos(): Promise<Producto[]> {
   return response.data.resultados
 }
 
-export async function obtenerProductoPorSlug(slug: string): Promise<Producto> {
-  const response = await apiClient.get<Producto>(`/productos/${slug}/`)
+export async function obtenerProductoPorSlug(slug: string): Promise<ProductoDetalle> {
+  const response = await apiClient.get<ProductoDetalle>(`/productos/${slug}/`)
   return response.data
 }

@@ -1,4 +1,5 @@
 import type { Producto } from "../../types/producto";
+import { Link } from "react-router-dom";
 
 interface ProductCardProps {
   producto: Producto;
@@ -11,7 +12,7 @@ export function ProductCard({ producto }: ProductCardProps) {
   const precioFinal = Number(producto.precio_con_descuento);
 
   return (
-    <article className="rounded-lg border border-gray-200 bg-white shadow-sm transition hover:shadow-md">
+    <article className="flex h-full flex-col rounded-lg border border-gray-200 bg-white shadow-sm transition hover:shadow-md">
       <div className="relative aspect-square overflow-hidden rounded-t-lg bg-gray-100">
         {producto.imagen_principal ? (
           <img
@@ -47,7 +48,7 @@ export function ProductCard({ producto }: ProductCardProps) {
         )}
       </div>
 
-      <div className="space-y-2 p-4">
+      <div className="flex flex-1 flex-col space-y-2 p-4">
         <p className="text-xs uppercase tracking-wide text-gray-500">
           {producto.categoria_nombre}
         </p>
@@ -72,13 +73,12 @@ export function ProductCard({ producto }: ProductCardProps) {
           <p className="text-sm font-medium text-red-600">Sin stock</p>
         )}
 
-        <button
-          type="button"
-          disabled={!estaDisponible}
-          className="mt-2 w-full rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        <Link
+          to={`/productos/${producto.slug}`}
+          className="mt-auto block w-full rounded bg-blue-600 px-4 py-2 text-center text-sm font-medium text-white transition hover:bg-blue-700"
         >
-          Ver producto
-        </button>
+          Ver detalles
+        </Link>
       </div>
     </article>
   );
