@@ -10,6 +10,7 @@ export function ProductoDetallePage() {
   const { slug } = useParams()
   const { producto, cargando, error } = useProductoDetalle(slug)
   const [indiceActivo, setIndiceActivo] = useState(0)
+  const [varianteSeleccionada, setVarianteSeleccionada] = useState<string | null>(null)
   const contenedorRef = useRef<HTMLDivElement>(null)
   const imagenRef = useRef<HTMLImageElement>(null)
 
@@ -40,6 +41,9 @@ export function ProductoDetallePage() {
 
   const imagenes = producto.imagenes.length > 0 ? producto.imagenes : []
   const imagenActiva = imagenes[indiceActivo]?.url ?? null
+
+  const requiereVariante = producto.variantes && producto.variantes.length > 0
+  const puedeAgregar = estaDisponible && (!requiereVariante || varianteSeleccionada !== null)
 
   function manejarMovimientoMouse(e: React.MouseEvent<HTMLDivElement>) {
     if (!contenedorRef.current || !imagenRef.current) return
@@ -111,10 +115,6 @@ export function ProductoDetallePage() {
             {producto.nombre}
           </h1>
 
-          {producto.descripcion && (
-            <p className="mt-2 text-sm text-gray-600">{producto.descripcion}</p>
-          )}
-
           <div className="mt-4 flex items-center gap-3">
             <span className="text-3xl font-bold text-blue-600">
               {formatearGuaranies(producto.precio_con_descuento)}
@@ -149,12 +149,66 @@ export function ProductoDetallePage() {
             )}
           </div>
 
+          {producto.descripcion && (
+            <section className="mt-6">
+              <h2 className="text-lg font-semibold text-gray-900">Descripción</h2>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                {producto.descripcion}
+              </p>
+            </section>
+          )}
+
+          {requiereVariante && (
+            <section className="mt-6">
+              <h2 className="text-lg font-semibold text-gray-900">Opciones</h2>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {producto.variantes.map((variante) => {
+                  const seleccionada = varianteSeleccionada === variante.id
+                  const disponible = variante.esta_activo && variante.tiene_stock
+
+                  return (
+                    <button
+                      key={variante.id}
+                      type="button"
+                      disabled={!disponible}
+                      onClick={() => setVarianteSeleccionada(variante.id)}
+                      className={`rounded border px-4 py-2 text-sm font-medium transition ${
+                        seleccionada
+                          ? 'border-blue-600 bg-blue-50 text-blue-700'
+                          : 'border-gray-300 text-gray-700 hover:border-blue-600'
+                      } ${!disponible ? 'cursor-not-allowed opacity-40 line-through' : ''}`}
+                    >
+                      {variante.nombre}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {!varianteSeleccionada && (
+                <p className="mt-2 text-xs text-amber-600">
+                  Elegí una opción antes de continuar.
+                </p>
+              )}
+            </section>
+          )}
+
+          {producto.variantes && producto.variantes.length === 0 && (
+            <p className="mt-4 text-sm text-gray-500">
+              Opción única.
+            </p>
+          )}
+
           <button
             type="button"
-            disabled={!estaDisponible}
+            disabled={!puedeAgregar}
             className="mt-6 w-full rounded bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            Agregar al carrito
+            {!estaDisponible
+              ? 'Producto agotado'
+              : requiereVariante && !varianteSeleccionada
+              ? 'Elegí una opción'
+              : 'Agregar al carrito'}
           </button>
         </div>
       </section>
