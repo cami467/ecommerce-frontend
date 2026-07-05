@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage'
 import MiCuentaPage from './pages/MiCuentaPage'
 import RegistroPage from './pages/RegistroPage'
 import { AuthBootstrap } from './components/AuthBootstrap'
+import { ProductosPage } from './pages/ProductosPage'
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registro" element={<RegistroPage />} />
+        <Route path="/productos" element={<ProductosPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/mi-cuenta" element={<MiCuentaPage />} />
