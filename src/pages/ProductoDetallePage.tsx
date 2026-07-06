@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useProductoDetalle } from '../hooks/useProductoDetalle'
+import { agregarAlCarrito } from '../api/carrito'
 
-function formatearGuaranies(valor: string) {
+function formatearGuaranies(valor: string | number) {
   return `Gs. ${Number(valor).toLocaleString('es-PY')}`
 }
 
@@ -11,6 +12,10 @@ export function ProductoDetallePage() {
   const { producto, cargando, error } = useProductoDetalle(slug)
   const [indiceActivo, setIndiceActivo] = useState(0)
   const [varianteSeleccionada, setVarianteSeleccionada] = useState<string | null>(null)
+  const [cantidad, setCantidad] = useState(1)
+  const [agregando, setAgregando] = useState(false)
+  const [mensajeCarrito, setMensajeCarrito] = useState('')
+  const [errorCarrito, setErrorCarrito] = useState('')
   const contenedorRef = useRef<HTMLDivElement>(null)
   const imagenRef = useRef<HTMLImageElement>(null)
 
@@ -43,7 +48,11 @@ export function ProductoDetallePage() {
   const imagenActiva = imagenes[indiceActivo]?.url ?? null
 
   const requiereVariante = producto.variantes && producto.variantes.length > 0
-  const puedeAgregar = estaDisponible && (!requiereVariante || varianteSeleccionada !== null)
+  const puedeAgregar =
+    estaDisponible &&
+    !agregando &&
+    (!requiereVariante || varianteSeleccionada !== null) &&
+    cantidad >= 1
 
   function manejarMovimientoMouse(e: React.MouseEvent<HTMLDivElement>) {
     if (!contenedorRef.current || !imagenRef.current) return
@@ -53,6 +62,30 @@ export function ProductoDetallePage() {
     const y = ((e.clientY - rect.top) / rect.height) * 100
 
     imagenRef.current.style.transformOrigin = `${x}% ${y}%`
+  }
+
+  async function handleAgregarCarrito() {
+    if (requiereVariante && !varianteSeleccionada) {
+      setErrorCarrito('Seleccioná una opción antes de agregar al carrito.')
+      return
+    }
+
+    try {
+      setAgregando(true)
+      setErrorCarrito('')
+      setMensajeCarrito('')
+
+      await agregarAlCarrito({
+        variante_id: varianteSeleccionada as string,
+        cantidad,
+      })
+
+      setMensajeCarrito('Producto agregado al carrito correctamente.')
+    } catch {
+      setErrorCarrito('No se pudo agregar el producto al carrito.')
+    } finally {
+      setAgregando(false)
+    }
   }
 
   return (
@@ -162,7 +195,7 @@ export function ProductoDetallePage() {
             <section className="mt-6">
               <h2 className="text-lg font-semibold text-gray-900">Opciones</h2>
 
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 grid gap-2">
                 {producto.variantes.map((variante) => {
                   const seleccionada = varianteSeleccionada === variante.id
                   const disponible = variante.esta_activo && variante.tiene_stock
@@ -171,15 +204,18 @@ export function ProductoDetallePage() {
                     <button
                       key={variante.id}
                       type="button"
-                      disabled={!disponible}
                       onClick={() => setVarianteSeleccionada(variante.id)}
-                      className={`rounded border px-4 py-2 text-sm font-medium transition ${
+                      disabled={!disponible}
+                      className={`rounded border px-3 py-2 text-left text-sm transition ${
                         seleccionada
                           ? 'border-blue-600 bg-blue-50 text-blue-700'
-                          : 'border-gray-300 text-gray-700 hover:border-blue-600'
-                      } ${!disponible ? 'cursor-not-allowed opacity-40 line-through' : ''}`}
+                          : 'border-gray-300 hover:border-blue-600'
+                      } disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400`}
                     >
-                      {variante.nombre}
+                      <span className="font-medium">{variante.nombre}</span>
+                      <span className="block text-xs text-gray-500">
+                        Stock: {variante.inventario}
+                      </span>
                     </button>
                   )
                 })}
@@ -199,17 +235,47 @@ export function ProductoDetallePage() {
             </p>
           )}
 
+          <div className="mt-6">
+            <label htmlFor="cantidad" className="block text-sm font-medium text-gray-700">
+              Cantidad
+            </label>
+
+            <input
+              id="cantidad"
+              type="number"
+              min={1}
+              value={cantidad}
+              onChange={(e) => setCantidad(Number(e.target.value))}
+              className="mt-1 w-24 rounded border border-gray-300 px-3 py-2"
+            />
+          </div>
+
           <button
             type="button"
+            onClick={handleAgregarCarrito}
             disabled={!puedeAgregar}
             className="mt-6 w-full rounded bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {!estaDisponible
               ? 'Producto agotado'
+              : agregando
+              ? 'Agregando...'
               : requiereVariante && !varianteSeleccionada
               ? 'Elegí una opción'
               : 'Agregar al carrito'}
           </button>
+
+          {mensajeCarrito && (
+            <p className="mt-3 rounded bg-green-50 p-3 text-sm text-green-700">
+              {mensajeCarrito}
+            </p>
+          )}
+
+          {errorCarrito && (
+            <p className="mt-3 rounded bg-red-50 p-3 text-sm text-red-700">
+              {errorCarrito}
+            </p>
+          )}
         </div>
       </section>
     </main>
