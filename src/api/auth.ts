@@ -44,7 +44,32 @@ export async function registro(datos: RegistroDatos): Promise<void> {
   await apiClient.post("/usuarios/registro/", datos);
 }
 
+// ------------------------------------------------------------------
+// CANDADO PARA inicializarSesion(): evita que dos llamadas en paralelo
+// (ej. React StrictMode invocando el useEffect de AuthBootstrap dos
+// veces al montar) lean el MISMO refresh token y ambas intenten
+// canjearlo. Como el backend usa ROTATE_REFRESH_TOKENS +
+// BLACKLIST_AFTER_ROTATION, el refresh token es de un solo uso: la
+// primera llamada lo canjea con éxito y la segunda, al llegar tarde
+// con el mismo token ya invalidado, fallaba y BORRABA la sesión
+// recién obtenida por la primera. Con este candado, la segunda
+// llamada simplemente espera y reutiliza el resultado de la primera.
+// ------------------------------------------------------------------
+let inicializarSesionPromise: Promise<void> | null = null;
+
 export async function inicializarSesion(): Promise<void> {
+  if (inicializarSesionPromise) {
+    return inicializarSesionPromise;
+  }
+
+  inicializarSesionPromise = ejecutarInicializarSesion().finally(() => {
+    inicializarSesionPromise = null;
+  });
+
+  return inicializarSesionPromise;
+}
+
+async function ejecutarInicializarSesion(): Promise<void> {
   const refreshToken = tokenStorage.getRefreshToken();
 
   if (!refreshToken) {
