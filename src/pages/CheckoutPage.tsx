@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { crearOrdenDesdeCarrito } from '../api/ordenes'
 import { useCarritoItems } from '../context/CarritoItemsContext'
 import type { CarritoItem } from '../types/carrito'
+import { isAxiosError } from 'axios'
 
 function formatearGuaranies(valor: string | number | null | undefined) {
   const numero = Number(valor ?? 0)
@@ -19,24 +20,37 @@ export function CheckoutPage() {
   const [error, setError] = useState('')
 
   async function handleConfirmarPedido() {
-    try {
-      setProcesando(true)
-      setError('')
+        try {
+          setProcesando(true)
+          setError('')
 
-      const orden = await crearOrdenDesdeCarrito({
-        codigo_cupon: codigoCupon.trim() || undefined,
-        notas: notas.trim() || undefined,
-      })
+          const orden = await crearOrdenDesdeCarrito({
+            codigo_cupon: codigoCupon.trim() || undefined,
+            notas: notas.trim() || undefined,
+          })
 
-      await refrescar()
+          await refrescar()
 
-      navigate(`/ordenes/${orden.id}`)
-    } catch {
-      setError('No se pudo crear la orden. Verificá tu carrito e intentá nuevamente.')
+          navigate(`/ordenes/${orden.id}`)
+        } catch (error) {
+      if (isAxiosError(error) && error.response?.data) {
+        console.log(error.response.data)
+
+        const data = error.response.data as { detail?: string; error?: string }
+
+        setError(
+          data.detail ||
+          data.error ||
+          'No se pudo crear la orden. Verificá tu carrito e intentá nuevamente.'
+        )
+      } else {
+        setError('No se pudo crear la orden. Verificá tu carrito e intentá nuevamente.')
+      }
     } finally {
-      setProcesando(false)
+      setProcesando(false)  
     }
   }
+
 
   if (cargando) {
     return (
