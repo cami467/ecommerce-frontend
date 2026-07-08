@@ -27,6 +27,10 @@ export function Header() {
               {nombreUsuario}
             </Link>
 
+            <Link to="/mis-pedidos" className="text-sm text-gray-700 hover:underline">
+            Mis pedidos
+            </Link>
+
             <Link to="/carrito" className="relative flex items-center gap-2 text-sm text-gray-700 hover:underline">
               <span className="text-2xl">🛒</span>
 

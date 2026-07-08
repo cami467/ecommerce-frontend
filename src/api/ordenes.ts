@@ -15,3 +15,8 @@ export async function obtenerOrdenPorId(id: string) {
   const response = await apiClient.get<Orden>(`/ordenes/${id}/`)
   return response.data
 }
+
+export async function obtenerMisOrdenes() {
+  const response = await apiClient.get<Orden[]>('/ordenes/')
+  return response.data
+}
