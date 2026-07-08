@@ -36,6 +36,8 @@ export interface Producto {
   imagen_principal: string | null;
   es_destacado: boolean;
   esta_activo: boolean;
+  variante_unica_id: string | null;
+  variantes?: VarianteProducto[]
 }
 
 export interface ProductoDetalle {
@@ -55,4 +57,32 @@ export interface ProductoDetalle {
   imagenes: ProductoImagen[];
   esta_activo: boolean;
   fecha_creacion: string;
+}
+
+export interface VarianteDetalleCarrito {
+  id: string
+  nombre: string
+  sku: string
+  precio_total: string
+  inventario: number
+  tiene_stock: boolean
+  esta_activo: boolean
+}
+
+export interface CarritoItem {
+  id: string
+  variante: string
+  variante_detalle: VarianteDetalleCarrito
+  cantidad: number
+  subtotal: number
+  esta_activo: boolean
+}
+
+export interface Carrito {
+  id: string
+  usuario: number
+  items: CarritoItem[]
+  cantidad_items: number
+  total: number
+  esta_activo: boolean
 }

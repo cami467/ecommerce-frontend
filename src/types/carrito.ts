@@ -20,6 +20,7 @@ export interface Carrito {
   items: CarritoItem[]
   cantidad_items: number
   subtotal: string
+  total: string 
   total_items: number
   esta_activo: boolean
 }

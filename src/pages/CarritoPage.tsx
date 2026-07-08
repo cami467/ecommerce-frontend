@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useCarrito } from '../hooks/useCarrito'
 
-function formatearGuaranies(valor: string) {
-  return `Gs. ${Number(valor).toLocaleString('es-PY')}`
+function formatearGuaranies(valor: string | number | null | undefined) {
+  const numero = Number(valor ?? 0)
+  return `Gs. ${numero.toLocaleString('es-PY')}`
 }
 
 export function CarritoPage() {
@@ -63,7 +64,7 @@ export function CarritoPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Carrito</h1>
           <p className="text-sm text-gray-600">
-            {carrito.total_items} producto(s) en tu carrito.
+            {carrito.cantidad_items} producto(s) en tu carrito.
           </p>
         </div>
 
@@ -88,7 +89,7 @@ export function CarritoPage() {
                 {item.imagen_producto ? (
                   <img
                     src={item.imagen_producto}
-                    alt={item.producto_nombre}
+                    alt={item.variante_detalle.nombre}
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -101,15 +102,15 @@ export function CarritoPage() {
               <div className="flex flex-1 flex-col justify-between">
                 <div>
                   <h2 className="font-semibold text-gray-900">
-                    {item.producto_nombre}
+                    {item.variante_detalle.nombre}
                   </h2>
 
                   <p className="text-sm text-gray-500">
-                    {item.variante_nombre}
+                    {item.variante_detalle.sku}
                   </p>
 
                   <p className="mt-1 text-sm text-gray-700">
-                    {formatearGuaranies(item.precio_unitario)}
+                    {formatearGuaranies(item.variante_detalle.precio_total)}
                   </p>
                 </div>
 
@@ -131,7 +132,7 @@ export function CarritoPage() {
                     <button
                       type="button"
                       onClick={() => cambiarCantidad(item.id, item.cantidad + 1)}
-                      disabled={actualizando || item.cantidad >= item.stock_disponible}
+                      disabled={actualizando || item.cantidad >= item.variante_detalle.inventario}
                       className="h-8 w-8 rounded border border-gray-300 disabled:opacity-50"
                     >
                       +
@@ -163,13 +164,13 @@ export function CarritoPage() {
 
           <div className="mt-4 flex justify-between text-sm">
             <span>Subtotal</span>
-            <span>{formatearGuaranies(carrito.subtotal)}</span>
+            <span>{formatearGuaranies(carrito.total)}</span>
           </div>
 
           <div className="mt-4 border-t pt-4">
             <div className="flex justify-between text-lg font-bold">
               <span>Total</span>
-              <span>{formatearGuaranies(carrito.subtotal)}</span>
+              <span>{formatearGuaranies(carrito.total)}</span>
             </div>
           </div>
 

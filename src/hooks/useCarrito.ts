@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   actualizarCantidadItem,
   eliminarItemCarrito,
@@ -12,18 +12,32 @@ export function useCarrito() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actualizando, setActualizando] = useState(false)
+  const ultimaPeticionId = useRef(0)
 
   async function cargarCarrito() {
+    const idDeEstaPeticion = ++ultimaPeticionId.current
+
     try {
       setCargando(true)
       setError(null)
 
       const data = await obtenerCarrito()
+
+      // Si mientras esperábamos esta respuesta se disparó una petición
+      // más nueva, esta respuesta ya quedó vieja: la descartamos.
+      if (idDeEstaPeticion !== ultimaPeticionId.current) {
+        return
+      }
+
       setCarrito(data)
     } catch {
-      setError('No se pudo cargar el carrito.')
+      if (idDeEstaPeticion === ultimaPeticionId.current) {
+        setError('No se pudo cargar el carrito.')
+      }
     } finally {
-      setCargando(false)
+      if (idDeEstaPeticion === ultimaPeticionId.current) {
+        setCargando(false)
+      }
     }
   }
 
@@ -59,7 +73,7 @@ export function useCarrito() {
       await vaciarCarrito()
       await cargarCarrito()
     } catch {
-      setError('No se pudo vaciar el carrito.')
+      setError('No se pudo vaciar el producto.')
     } finally {
       setActualizando(false)
     }
