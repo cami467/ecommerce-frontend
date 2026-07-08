@@ -10,6 +10,7 @@ import { ProductosPage } from './pages/ProductosPage'
 import { ProductoDetallePage } from './pages/ProductoDetallePage'
 import { CarritoPage } from './pages/CarritoPage'
 import { CarritoItemsProvider } from './context/CarritoItemsContext'
+import { CheckoutPage } from './pages/CheckoutPage'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/productos" element={<ProductosPage />} />
         <Route path="/productos/:slug" element={<ProductoDetallePage />} />
         <Route path="/carrito" element={<CarritoPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/mi-cuenta" element={<MiCuentaPage />} />
