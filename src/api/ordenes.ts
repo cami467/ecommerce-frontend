@@ -7,7 +7,7 @@ interface CrearOrdenPayload {
 }
 
 export async function crearOrdenDesdeCarrito(payload: CrearOrdenPayload) {
-  const response = await apiClient.post<Orden>('/ordenes/crear-desde-carrito/', payload)
+  const response = await apiClient.post<Orden>('/ordenes/crear/', payload)
   return response.data
 }
 
