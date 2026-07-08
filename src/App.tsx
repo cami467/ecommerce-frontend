@@ -8,12 +8,13 @@ import RegistroPage from './pages/RegistroPage'
 import { AuthBootstrap } from './components/AuthBootstrap'
 import { ProductosPage } from './pages/ProductosPage'
 import { ProductoDetallePage } from './pages/ProductoDetallePage'
-
+import { CarritoPage } from './pages/CarritoPage'
+import { CarritoItemsProvider } from './context/CarritoItemsContext'
 
 function App() {
   return (
-    <>
-     <AuthBootstrap />
+    <CarritoItemsProvider>
+      <AuthBootstrap />
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -21,12 +22,13 @@ function App() {
         <Route path="/registro" element={<RegistroPage />} />
         <Route path="/productos" element={<ProductosPage />} />
         <Route path="/productos/:slug" element={<ProductoDetallePage />} />
+        <Route path="/carrito" element={<CarritoPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/mi-cuenta" element={<MiCuentaPage />} />
         </Route>
       </Routes>
-    </>
+    </CarritoItemsProvider>
   )
 }
 
