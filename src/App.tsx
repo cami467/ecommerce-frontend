@@ -14,6 +14,7 @@ import { CheckoutPage } from './pages/CheckoutPage'
 import { OrdenDetallePage } from './pages/OrdenDetallePage'
 import { MisPedidosPage } from './pages/MisPedidosPage'
 import { CambiarPasswordPage } from './pages/CambiarPasswordPage'
+import { PagoPage } from './pages/PagoPage'
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/productos/:slug" element={<ProductoDetallePage />} />
             <Route path="/carrito" element={<CarritoPage />} />
             <Route path="/cambiar-password" element={<CambiarPasswordPage />} />
+            <Route path="/pagos/:ordenId" element={<PagoPage />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/mi-cuenta" element={<MiCuentaPage />} />
