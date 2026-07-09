@@ -12,6 +12,7 @@ import { CarritoPage } from './pages/CarritoPage'
 import { CarritoItemsProvider } from './context/CarritoItemsContext'
 import { CheckoutPage } from './pages/CheckoutPage'
 import { OrdenDetallePage } from './pages/OrdenDetallePage'
+import { MisPedidosPage } from './pages/MisPedidosPage'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/carrito" element={<CarritoPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/ordenes/:id" element={<OrdenDetallePage />} />
+        <Route path="/mis-pedidos" element={<MisPedidosPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/mi-cuenta" element={<MiCuentaPage />} />

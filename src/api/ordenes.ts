@@ -16,7 +16,22 @@ export async function obtenerOrdenPorId(id: string) {
   return response.data
 }
 
-export async function obtenerMisOrdenes() {
-  const response = await apiClient.get<Orden[]>('/ordenes/')
-  return response.data
+interface OrdenesResponse {
+  total?: number
+  paginas?: number
+  pagina_actual?: number
+  siguiente?: string | null
+  anterior?: string | null
+  resultados?: Orden[]
+  results?: Orden[]
+}
+
+export async function obtenerMisOrdenes(): Promise<Orden[]> {
+  const response = await apiClient.get<Orden[] | OrdenesResponse>('/ordenes/')
+
+  if (Array.isArray(response.data)) {
+    return response.data
+  }
+
+  return response.data.resultados ?? response.data.results ?? []
 }
