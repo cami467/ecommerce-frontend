@@ -18,22 +18,26 @@ function App() {
   return (
     <CarritoItemsProvider>
       <AuthBootstrap />
-      <Header />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/registro" element={<RegistroPage />} />
-        <Route path="/productos" element={<ProductosPage />} />
-        <Route path="/productos/:slug" element={<ProductoDetallePage />} />
-        <Route path="/carrito" element={<CarritoPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/ordenes/:id" element={<OrdenDetallePage />} />
-        <Route path="/mis-pedidos" element={<MisPedidosPage />} />
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <div className="flex-1">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/registro" element={<RegistroPage />} />
+            <Route path="/productos" element={<ProductosPage />} />
+            <Route path="/productos/:slug" element={<ProductoDetallePage />} />
+            <Route path="/carrito" element={<CarritoPage />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/mi-cuenta" element={<MiCuentaPage />} />
-        </Route>
-      </Routes>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/mi-cuenta" element={<MiCuentaPage />} />
+              <Route path="/mis-pedidos" element={<MisPedidosPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/ordenes/:id" element={<OrdenDetallePage />} />
+            </Route>
+          </Routes>
+        </div>
+      </div>
     </CarritoItemsProvider>
   )
 }
