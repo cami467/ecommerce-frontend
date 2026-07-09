@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { ProductCard } from '../components/productos/ProductCard'
 import { ProductCardSkeleton } from '../components/productos/ProductCardSkeleton'
 import { useProductos } from '../hooks/useProductos'
@@ -16,18 +17,39 @@ export function ProductosPage() {
     setPagina,
   } = useProductos()
 
-  const [busqueda, setBusqueda] = useState('')
-  const [soloDestacados, setSoloDestacados] = useState(false)
-  const [orden, setOrden] = useState('relevancia')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Fuente de verdad unica: la URL. Nada de estado local duplicado
+  // ni useEffect de sincronizacion en ninguna direccion -- se lee
+  // directo de searchParams en cada render, y se escribe directo
+  // ahi mismo desde los handlers de los inputs.
+  const busqueda = searchParams.get('buscar') ?? ''
+  const categoriaSeleccionada = searchParams.get('categoria') ?? ''
+  const soloDestacados = searchParams.get('destacados') === 'true'
+  const orden = searchParams.get('orden') ?? 'relevancia'
 
   const [categorias, setCategorias] = useState<Categoria[]>([])
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('')
 
+  // Carga de categorías (esto no vive en la URL, es independiente)
   useEffect(() => {
     obtenerCategorias()
       .then(setCategorias)
       .catch(() => setCategorias([]))
   }, [])
+
+  // Actualiza un parametro puntual de la URL, sacandolo si queda vacio
+  // o si vuelve a su valor por defecto, para no ensuciar la URL.
+  function actualizarParam(clave: string, valor: string, valorPorDefecto = '') {
+    const params = new URLSearchParams(searchParams)
+
+    if (!valor || valor === valorPorDefecto) {
+      params.delete(clave)
+    } else {
+      params.set(clave, valor)
+    }
+
+    setSearchParams(params, { replace: true })
+  }
 
   if (cargando) {
     return (
@@ -88,6 +110,10 @@ export function ProductosPage() {
     soloDestacados ||
     orden !== 'relevancia'
 
+  const limpiarFiltros = () => {
+    setSearchParams({}, { replace: true })
+  }
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-8">
       <header className="mb-6">
@@ -104,7 +130,7 @@ export function ProductosPage() {
         <input
           type="search"
           value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
+          onChange={(e) => actualizarParam('buscar', e.target.value)}
           placeholder="Buscar productos..."
           className="w-full rounded border border-gray-300 px-3 py-2 sm:max-w-xs"
         />
@@ -114,14 +140,20 @@ export function ProductosPage() {
             <input
               type="checkbox"
               checked={soloDestacados}
-              onChange={(e) => setSoloDestacados(e.target.checked)}
+              onChange={(e) =>
+                actualizarParam(
+                  'destacados',
+                  e.target.checked ? 'true' : '',
+                  ''
+                )
+              }
             />
             Solo destacados
           </label>
 
           <select
             value={categoriaSeleccionada}
-            onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+            onChange={(e) => actualizarParam('categoria', e.target.value)}
             className="rounded border border-gray-300 px-3 py-2"
           >
             <option value="">Todas las categorías</option>
@@ -134,7 +166,9 @@ export function ProductosPage() {
 
           <select
             value={orden}
-            onChange={(e) => setOrden(e.target.value)}
+            onChange={(e) =>
+              actualizarParam('orden', e.target.value, 'relevancia')
+            }
             className="rounded border border-gray-300 px-3 py-2"
           >
             <option value="relevancia">Relevancia</option>
@@ -144,12 +178,7 @@ export function ProductosPage() {
 
           <button
             type="button"
-            onClick={() => {
-              setBusqueda('')
-              setCategoriaSeleccionada('')
-              setSoloDestacados(false)
-              setOrden('relevancia')
-            }}
+            onClick={limpiarFiltros}
             className="rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
             Limpiar filtros
@@ -170,12 +199,7 @@ export function ProductosPage() {
           {hayFiltrosActivos && (
             <button
               type="button"
-              onClick={() => {
-                setBusqueda('')
-                setCategoriaSeleccionada('')
-                setSoloDestacados(false)
-                setOrden('relevancia')
-              }}
+              onClick={limpiarFiltros}
               className="mt-4 rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
             >
               Limpiar filtros
