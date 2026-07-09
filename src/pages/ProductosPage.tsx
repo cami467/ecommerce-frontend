@@ -73,12 +73,21 @@ export function ProductosPage() {
     return 0
   })
 
+  const hayFiltrosActivos =
+    busqueda.trim() !== '' ||
+    categoriaSeleccionada !== '' ||
+    soloDestacados ||
+    orden !== 'relevancia'
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-8">
       <header className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Productos</h1>
         <p className="mt-1 text-sm text-gray-600">
           Explorá nuestro catálogo disponible.
+        </p>
+        <p className="mt-1 text-sm text-gray-600">
+          Mostrando {productosOrdenados.length} de {productos.length} productos.
         </p>
       </header>
 
@@ -140,8 +149,29 @@ export function ProductosPage() {
       </div>
 
       {productosOrdenados.length === 0 ? (
-        <div className="rounded bg-gray-50 p-6 text-center text-gray-600">
-          No hay productos disponibles.
+        <div className="rounded-lg bg-white p-8 text-center shadow">
+          <h2 className="text-lg font-semibold text-gray-900">
+            No encontramos productos
+          </h2>
+
+          <p className="mt-2 text-sm text-gray-600">
+            Probá con otra búsqueda o limpiá los filtros aplicados.
+          </p>
+
+          {hayFiltrosActivos && (
+            <button
+              type="button"
+              onClick={() => {
+                setBusqueda('')
+                setCategoriaSeleccionada('')
+                setSoloDestacados(false)
+                setOrden('relevancia')
+              }}
+              className="mt-4 rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+            >
+              Limpiar filtros
+            </button>
+          )}
         </div>
       ) : (
         <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
