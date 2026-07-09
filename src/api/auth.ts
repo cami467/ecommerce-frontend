@@ -27,6 +27,12 @@ interface RegistroDatos {
   telefono?: string;
 }
 
+export interface ActualizarPerfilPayload {
+  first_name: string;
+  last_name: string;
+  telefono?: string;
+}
+
 export async function login(credenciales: LoginCredenciales): Promise<void> {
   const response = await apiClient.post<LoginResponse>("/token/", {
     email: credenciales.email.trim().toLowerCase(),
@@ -42,6 +48,16 @@ export async function login(credenciales: LoginCredenciales): Promise<void> {
 
 export async function registro(datos: RegistroDatos): Promise<void> {
   await apiClient.post("/usuarios/registro/", datos);
+}
+
+export async function obtenerPerfil() {
+  const response = await apiClient.get<Usuario>("/usuarios/perfil/");
+  return response.data;
+}
+
+export async function actualizarPerfil(payload: ActualizarPerfilPayload) {
+  const response = await apiClient.patch<Usuario>("/usuarios/perfil/", payload);
+  return response.data;
 }
 
 // ------------------------------------------------------------------
@@ -80,9 +96,7 @@ async function ejecutarInicializarSesion(): Promise<void> {
   try {
     const refreshResponse = await apiClient.post<RefreshResponse>(
       "/token/refresh/",
-      {
-        refresh: refreshToken,
-      },
+      { refresh: refreshToken }
     );
 
     const { access, refresh } = refreshResponse.data;
