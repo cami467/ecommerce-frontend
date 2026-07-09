@@ -1,15 +1,29 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useCarritoItems } from '../../context/CarritoItemsContext'
+import { useState } from 'react'
 
 export function Header() {
   const { estaAutenticado, usuario, logout } = useAuth()
   const navigate = useNavigate()
   const { cantidadItems, total } = useCarritoItems()
+  const [busquedaGlobal, setBusquedaGlobal] = useState('')
 
   async function handleLogout() {
     await logout()
     navigate('/login')
+  }
+
+  function handleBuscar(e: React.FormEvent) {
+    e.preventDefault()
+    const termino = busquedaGlobal.trim()
+
+    if (!termino) {
+      navigate('/productos')
+      return
+    }
+
+    navigate(`/productos?buscar=${encodeURIComponent(termino)}`)
   }
 
   const nombreUsuario = usuario?.nombre_completo || usuario?.email || 'Mi cuenta'
@@ -20,6 +34,25 @@ export function Header() {
         Tienda
       </Link>
 
+      {/* Buscador global */}
+      <form onSubmit={handleBuscar} className="hidden flex-1 px-8 md:block">
+        <div className="flex">
+          <input
+            type="search"
+            value={busquedaGlobal}
+            onChange={(e) => setBusquedaGlobal(e.target.value)}
+            placeholder="Buscar productos..."
+            className="w-full rounded-l border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="rounded-r bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            Buscar
+          </button>
+        </div>
+      </form>
+
       <nav className="flex items-center gap-6">
         {estaAutenticado ? (
           <>
@@ -28,7 +61,7 @@ export function Header() {
             </Link>
 
             <Link to="/mis-pedidos" className="text-sm text-gray-700 hover:underline">
-            Mis pedidos
+              Mis pedidos
             </Link>
 
             <Link to="/carrito" className="relative flex items-center gap-2 text-sm text-gray-700 hover:underline">
