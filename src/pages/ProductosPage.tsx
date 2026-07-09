@@ -26,6 +26,7 @@ export function ProductosPage() {
   const busqueda = searchParams.get('buscar') ?? ''
   const categoriaSeleccionada = searchParams.get('categoria') ?? ''
   const soloDestacados = searchParams.get('destacados') === 'true'
+  const soloOfertas = searchParams.get('ofertas') === 'true'
   const orden = searchParams.get('orden') ?? 'relevancia'
 
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -85,11 +86,15 @@ export function ProductosPage() {
 
     const coincideDestacado = soloDestacados ? producto.es_destacado : true
 
+    const coincideOferta = soloOfertas
+      ? Number(producto.porcentaje_descuento) > 0
+      : true
+
     const coincideCategoria = categoriaSeleccionada
       ? producto.categoria_nombre === categoriaSeleccionada
       : true
 
-    return coincideBusqueda && coincideDestacado && coincideCategoria
+    return coincideBusqueda && coincideDestacado && coincideOferta && coincideCategoria
   })
 
   const productosOrdenados = [...productosFiltrados].sort((a, b) => {
@@ -108,6 +113,7 @@ export function ProductosPage() {
     busqueda.trim() !== '' ||
     categoriaSeleccionada !== '' ||
     soloDestacados ||
+    soloOfertas ||
     orden !== 'relevancia'
 
   const limpiarFiltros = () => {
@@ -149,6 +155,17 @@ export function ProductosPage() {
               }
             />
             Solo destacados
+          </label>
+
+          <label className="flex items-center gap-2 text-sm text-gray-700">
+            <input
+              type="checkbox"
+              checked={soloOfertas}
+              onChange={(e) =>
+                actualizarParam('ofertas', e.target.checked ? 'true' : '', '')
+              }
+            />
+            Solo ofertas
           </label>
 
           <select
