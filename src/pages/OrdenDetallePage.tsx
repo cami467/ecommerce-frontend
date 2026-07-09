@@ -36,10 +36,6 @@ export function OrdenDetallePage() {
     cargarOrden()
   }, [id])
 
-  // Nota: mantenemos "pedidos" como seccionActiva en las 3 ramas
-  // (cargando / error / éxito) para que el sidebar no "parpadee"
-  // cambiando de sección activa mientras carga la orden.
-
   if (cargando) {
     return (
       <AccountLayout seccionActiva="pedidos">
@@ -116,11 +112,12 @@ export function OrdenDetallePage() {
             )}
 
             {Number(orden.costo_envio) > 0 && (
-                <div className="flex justify-between">
-                    <span>Envío</span>
-                    <span>{formatearGuaranies(orden.costo_envio)}</span>
-                </div>
+              <div className="flex justify-between">
+                <span>Envío</span>
+                <span>{formatearGuaranies(orden.costo_envio)}</span>
+              </div>
             )}
+
             {orden.codigo_cupon && (
               <div className="flex justify-between">
                 <span>Cupón</span>
@@ -136,6 +133,15 @@ export function OrdenDetallePage() {
             </div>
           </div>
 
+          {/* Botón para pagar pedido */}
+          <Link
+            to={`/pagos/${orden.id}`}
+            className="mt-4 block w-full rounded bg-green-600 px-4 py-3 text-center font-medium text-white hover:bg-green-700"
+          >
+            Pagar pedido
+          </Link>
+
+          {/* Botón para seguir comprando */}
           <Link
             to="/productos"
             className="mt-6 block w-full rounded bg-blue-600 px-4 py-3 text-center font-medium text-white hover:bg-blue-700"
