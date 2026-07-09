@@ -1,14 +1,14 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
-type SeccionActiva = 'perfil' | 'pedidos' | 'catalogo'
+type SeccionActiva = "perfil" | "pedidos" | "password" | "catalogo";
 
 interface AccountSidebarProps {
-  nombreUsuario: string
-  avatar?: string
-  seccionActiva: SeccionActiva
-  onLogout: () => void
-  expandido: boolean
-  setExpandido: (valor: boolean) => void
+  nombreUsuario: string;
+  avatar?: string;
+  seccionActiva: SeccionActiva;
+  onLogout: () => void;
+  expandido: boolean;
+  setExpandido: (valor: boolean) => void;
 }
 
 function ItemMenu({
@@ -18,24 +18,24 @@ function ItemMenu({
   activo,
   expandido,
 }: {
-  to: string
-  icono: string
-  label: string
-  activo: boolean
-  expandido: boolean
+  to: string;
+  icono: string;
+  label: string;
+  activo: boolean;
+  expandido: boolean;
 }) {
   return (
     <Link
       to={to}
       className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
         activo
-          ? 'bg-blue-100 text-blue-700 font-medium'
-          : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'
+          ? "bg-blue-100 text-blue-700 font-medium"
+          : "text-gray-600 hover:bg-gray-100 hover:text-blue-600"
       }`}
     >
       <span
         className={`flex h-7 w-7 items-center justify-center rounded-md text-base ${
-          activo ? 'bg-blue-200 text-blue-700' : 'bg-gray-200 text-gray-500'
+          activo ? "bg-blue-200 text-blue-700" : "bg-gray-200 text-gray-500"
         }`}
       >
         {icono}
@@ -43,7 +43,7 @@ function ItemMenu({
 
       {expandido && <span className="whitespace-nowrap">{label}</span>}
     </Link>
-  )
+  );
 }
 
 export function AccountSidebar({
@@ -69,7 +69,7 @@ export function AccountSidebar({
       // - "shrink-0" para que, dentro del flex del layout padre, el
       //   sidebar nunca se achique cuando el contenido principal crece.
       className={`sticky top-0 z-40 flex h-screen shrink-0 flex-col overflow-hidden border-r border-gray-200 bg-white shadow-sm transition-all duration-300 ${
-        expandido ? 'w-56' : 'w-20'
+        expandido ? "w-56" : "w-20"
       }`}
     >
       <div className="flex items-center gap-3 border-b border-gray-200 px-5 py-5">
@@ -105,7 +105,7 @@ export function AccountSidebar({
             to="/mi-cuenta"
             icono="👤"
             label="Perfil"
-            activo={seccionActiva === 'perfil'}
+            activo={seccionActiva === "perfil"}
             expandido={expandido}
           />
 
@@ -113,7 +113,7 @@ export function AccountSidebar({
             to="/mis-pedidos"
             icono="📦"
             label="Mis pedidos"
-            activo={seccionActiva === 'pedidos'}
+            activo={seccionActiva === "pedidos"}
             expandido={expandido}
           />
 
@@ -121,7 +121,15 @@ export function AccountSidebar({
             to="/productos"
             icono="🛍️"
             label="Catálogo"
-            activo={seccionActiva === 'catalogo'}
+            activo={seccionActiva === "catalogo"}
+            expandido={expandido}
+          />
+
+          <ItemMenu
+            to="/cambiar-password"
+            icono="🔒"
+            label="Cambiar contraseña"
+            activo={seccionActiva === "password"}
             expandido={expandido}
           />
         </nav>
@@ -143,9 +151,11 @@ export function AccountSidebar({
             🚪
           </span>
 
-          {expandido && <span className="whitespace-nowrap">Cerrar sesión</span>}
+          {expandido && (
+            <span className="whitespace-nowrap">Cerrar sesión</span>
+          )}
         </button>
       </div>
     </aside>
-  )
+  );
 }
