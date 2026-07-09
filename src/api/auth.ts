@@ -132,3 +132,15 @@ export async function logout(): Promise<void> {
     useAuthStore.getState().logout();
   }
 }
+
+export async function cambiarPassword(data: {
+  password_actual: string
+  password_nueva: string
+}) {
+  const response = await apiClient.post(
+    "/usuarios/cambiar-password/",
+    data
+  )
+
+  return response.data
+}
