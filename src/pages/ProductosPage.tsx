@@ -1,13 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ProductCard } from '../components/productos/ProductCard'
 import { ProductCardSkeleton } from '../components/productos/ProductCardSkeleton'
 import { useProductos } from '../hooks/useProductos'
+import { obtenerCategorias } from '../api/categorias'
+import type { Categoria } from '../types/categoria'
 
 export function ProductosPage() {
   const { productos, cargando, error } = useProductos()
   const [busqueda, setBusqueda] = useState('')
   const [soloDestacados, setSoloDestacados] = useState(false)
   const [orden, setOrden] = useState('relevancia')
+
+  const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('')
+
+  useEffect(() => {
+    obtenerCategorias()
+      .then(setCategorias)
+      .catch(() => setCategorias([]))
+  }, [])
 
   if (cargando) {
     return (
@@ -40,8 +51,14 @@ export function ProductosPage() {
     const coincideBusqueda = producto.nombre
       .toLowerCase()
       .includes(busqueda.toLowerCase())
+
     const coincideDestacado = soloDestacados ? producto.es_destacado : true
-    return coincideBusqueda && coincideDestacado
+
+    const coincideCategoria = categoriaSeleccionada
+      ? producto.categoria_nombre === categoriaSeleccionada
+      : true
+
+    return coincideBusqueda && coincideDestacado && coincideCategoria
   })
 
   const productosOrdenados = [...productosFiltrados].sort((a, b) => {
@@ -85,6 +102,19 @@ export function ProductosPage() {
           </label>
 
           <select
+            value={categoriaSeleccionada}
+            onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+            className="rounded border border-gray-300 px-3 py-2"
+          >
+            <option value="">Todas las categorías</option>
+            {categorias.map((categoria) => (
+              <option key={categoria.id} value={categoria.nombre}>
+                {categoria.nombre}
+              </option>
+            ))}
+          </select>
+
+          <select
             value={orden}
             onChange={(e) => setOrden(e.target.value)}
             className="rounded border border-gray-300 px-3 py-2"
@@ -93,6 +123,19 @@ export function ProductosPage() {
             <option value="precio_asc">Menor precio</option>
             <option value="precio_desc">Mayor precio</option>
           </select>
+
+          <button
+            type="button"
+            onClick={() => {
+              setBusqueda('')
+              setCategoriaSeleccionada('')
+              setSoloDestacados(false)
+              setOrden('relevancia')
+            }}
+            className="rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+          >
+            Limpiar filtros
+          </button>
         </div>
       </div>
 
