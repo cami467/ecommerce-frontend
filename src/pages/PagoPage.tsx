@@ -15,6 +15,33 @@ function formatearGuaranies(valor: string | number | null | undefined) {
   return `Gs. ${numero.toLocaleString('es-PY')}`
 }
 
+function obtenerEstiloEstadoPago(estado: string) {
+  if (estado === 'approved') {
+    return {
+      contenedor: 'bg-green-50 border-green-200 text-green-800',
+      icono: '✅',
+      titulo: 'Pago aprobado',
+      descripcion: 'El pago fue procesado correctamente.',
+    }
+  }
+
+  if (estado === 'rejected') {
+    return {
+      contenedor: 'bg-red-50 border-red-200 text-red-800',
+      icono: '❌',
+      titulo: 'Pago rechazado',
+      descripcion: 'El pago no pudo ser procesado.',
+    }
+  }
+
+  return {
+    contenedor: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    icono: '⏳',
+    titulo: 'Pago pendiente',
+    descripcion: 'El pago está esperando confirmación.',
+  }
+}
+
 export function PagoPage() {
   const { ordenId } = useParams()
   const [pasarela, setPasarela] = useState<PasarelaPago>('efectivo')
@@ -102,9 +129,21 @@ export function PagoPage() {
           </>
         ) : (
           <div>
-            <h2 className="text-lg font-bold text-gray-900">
-              Pago {pago.estado_display}
-            </h2>
+            {/* Bloque visual del estado */}
+            {(() => {
+              const estadoVisual = obtenerEstiloEstadoPago(pago.estado)
+              return (
+                <div className={`rounded-lg border p-4 ${estadoVisual.contenedor}`}>
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">{estadoVisual.icono}</span>
+                    <div>
+                      <h2 className="text-lg font-bold">{estadoVisual.titulo}</h2>
+                      <p className="mt-1 text-sm">{estadoVisual.descripcion}</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
 
             <div className="mt-4 space-y-2 text-sm">
               <p>
@@ -145,16 +184,18 @@ export function PagoPage() {
               </div>
             )}
 
-            {pago.es_exitoso && (
-              <div className="mt-6 rounded bg-green-50 p-3 text-sm text-green-700">
-                Pago aprobado correctamente.
-              </div>
-            )}
-
+            {/* Botón reintentar si fue rechazado */}
             {pago.estado === 'rejected' && (
-              <div className="mt-6 rounded bg-red-50 p-3 text-sm text-red-700">
-                El pago fue rechazado.
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setPago(null)
+                  setError('')
+                }}
+                className="mt-6 w-full rounded bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-700"
+              >
+                Intentar nuevamente
+              </button>
             )}
           </div>
         )}
@@ -164,6 +205,14 @@ export function PagoPage() {
             {error}
           </div>
         )}
+
+        {/* Volver al detalle de la orden */}
+        <Link
+          to={`/ordenes/${ordenId}`}
+          className="mt-3 block text-center text-sm text-blue-600 hover:underline"
+        >
+          Volver al detalle del pedido
+        </Link>
       </section>
     </main>
   )
