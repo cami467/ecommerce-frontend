@@ -6,7 +6,16 @@ import { obtenerCategorias } from '../api/categorias'
 import type { Categoria } from '../types/categoria'
 
 export function ProductosPage() {
-  const { productos, cargando, error } = useProductos()
+  const {
+    productos,
+    cargando,
+    error,
+    pagina,
+    paginas,
+    total,
+    setPagina,
+  } = useProductos()
+
   const [busqueda, setBusqueda] = useState('')
   const [soloDestacados, setSoloDestacados] = useState(false)
   const [orden, setOrden] = useState('relevancia')
@@ -87,7 +96,7 @@ export function ProductosPage() {
           Explorá nuestro catálogo disponible.
         </p>
         <p className="mt-1 text-sm text-gray-600">
-          Mostrando {productosOrdenados.length} de {productos.length} productos.
+          Mostrando {productosOrdenados.length} de {total} productos.
         </p>
       </header>
 
@@ -174,11 +183,39 @@ export function ProductosPage() {
           )}
         </div>
       ) : (
-        <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {productosOrdenados.map((producto) => (
-            <ProductCard key={producto.id} producto={producto} />
-          ))}
-        </section>
+        <>
+          <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {productosOrdenados.map((producto) => (
+              <ProductCard key={producto.id} producto={producto} />
+            ))}
+          </section>
+
+          {paginas > 1 && (
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setPagina(Math.max(1, pagina - 1))}
+                disabled={pagina <= 1}
+                className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50"
+              >
+                Anterior
+              </button>
+
+              <span className="text-sm text-gray-600">
+                Página {pagina} de {paginas}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setPagina(Math.min(paginas, pagina + 1))}
+                disabled={pagina >= paginas}
+                className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50"
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
+        </>
       )}
     </main>
   )

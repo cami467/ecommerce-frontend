@@ -10,12 +10,18 @@ interface ProductosResponse {
   resultados: Producto[]
 }
 
-export async function obtenerProductos(): Promise<Producto[]> {
-  const response = await apiClient.get<ProductosResponse>('/productos/')
-  return response.data.resultados
+export async function obtenerProductos(pagina = 1): Promise<ProductosResponse> {
+  const response = await apiClient.get<ProductosResponse>('/productos/', {
+    params: {
+      page: pagina,
+    },
+  })
+
+  return response.data
 }
 
 export async function obtenerProductoPorSlug(slug: string): Promise<ProductoDetalle> {
   const response = await apiClient.get<ProductoDetalle>(`/productos/${slug}/`)
   return response.data
 }
+
