@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { AccountSidebar } from '../components/account/AccountSidebar'
 
-type Seccion = 'perfil' | 'pedidos' | 'catalogo'
+type Seccion = 'perfil' | 'pedidos'| "password"  | 'catalogo'
 
 interface AccountLayoutProps {
   children: ReactNode
