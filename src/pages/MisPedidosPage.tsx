@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { obtenerMisOrdenes } from '../api/ordenes'
 import type { Orden } from '../types/orden'
+import { AccountLayout } from '../layout/AccountLayout'
 
 function formatearGuaranies(valor: string | number | null | undefined) {
   const numero = Number(valor ?? 0)
@@ -37,24 +38,24 @@ export function MisPedidosPage() {
 
   if (cargando) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-8">
+      <AccountLayout seccionActiva="pedidos">
         <p className="text-gray-600">Cargando pedidos...</p>
-      </main>
+      </AccountLayout>
     )
   }
 
   if (error) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-8">
+      <AccountLayout seccionActiva="pedidos">
         <div className="rounded bg-red-50 p-4 text-red-700">
           {error}
         </div>
-      </main>
+      </AccountLayout>
     )
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <AccountLayout seccionActiva="pedidos">
       <h1 className="text-2xl font-bold text-gray-900">Mis pedidos</h1>
 
       {ordenes.length === 0 ? (
@@ -107,6 +108,6 @@ export function MisPedidosPage() {
           ))}
         </div>
       )}
-    </main>
+    </AccountLayout>
   )
 }

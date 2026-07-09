@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { obtenerOrdenPorId } from '../api/ordenes'
 import type { Orden } from '../types/orden'
+import { AccountLayout } from '../layout/AccountLayout'
 
 function formatearGuaranies(valor: string | number | null | undefined) {
   const numero = Number(valor ?? 0)
@@ -35,26 +36,30 @@ export function OrdenDetallePage() {
     cargarOrden()
   }, [id])
 
+  // Nota: mantenemos "pedidos" como seccionActiva en las 3 ramas
+  // (cargando / error / éxito) para que el sidebar no "parpadee"
+  // cambiando de sección activa mientras carga la orden.
+
   if (cargando) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-8">
+      <AccountLayout seccionActiva="pedidos">
         <p className="text-gray-600">Cargando orden...</p>
-      </main>
+      </AccountLayout>
     )
   }
 
   if (error || !orden) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-8">
+      <AccountLayout seccionActiva="pedidos">
         <div className="rounded bg-red-50 p-4 text-red-700">
           {error || 'Orden no encontrada.'}
         </div>
-      </main>
+      </AccountLayout>
     )
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <AccountLayout seccionActiva="pedidos">
       <div className="rounded-lg bg-green-50 p-5 text-green-800">
         <h1 className="text-2xl font-bold">Pedido confirmado</h1>
         <p className="mt-1">
@@ -139,6 +144,6 @@ export function OrdenDetallePage() {
           </Link>
         </aside>
       </section>
-    </main>
+    </AccountLayout>
   )
 }
