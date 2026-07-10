@@ -14,7 +14,7 @@ export function useProductoDetalle(slug?: string) {
       return
     }
 
-    const slugActual = slug // <- esto sigue siendo necesario
+    const slugActual = slug 
 
     let activo = true
 

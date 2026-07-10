@@ -35,10 +35,6 @@ export function CambiarPasswordPage() {
       setMensaje("Las contraseñas no coinciden.")
       return
     }
-
-    // 3. Enviar al backend usando apiClient (mismo cliente axios que usa
-    // todo el resto de la app: agrega el Bearer token correcto desde
-    // Zustand y refresca automáticamente si está vencido).
     try {
       setEnviando(true)
       setEsError(false)
