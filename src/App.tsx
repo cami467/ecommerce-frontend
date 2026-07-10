@@ -1,20 +1,22 @@
-import { Routes, Route } from 'react-router-dom'
-import { Header } from './components/layout/Header'
-import { ProtectedRoute } from './routes/ProtectedRoute'
-import HomePage from './pages/HomePage'
-import LoginPage from './pages/LoginPage'
-import MiCuentaPage from './pages/MiCuentaPage'
-import RegistroPage from './pages/RegistroPage'
-import { AuthBootstrap } from './components/AuthBootstrap'
-import { ProductosPage } from './pages/ProductosPage'
-import { ProductoDetallePage } from './pages/ProductoDetallePage'
-import { CarritoPage } from './pages/CarritoPage'
-import { CarritoItemsProvider } from './context/CarritoItemsContext'
-import { CheckoutPage } from './pages/CheckoutPage'
-import { OrdenDetallePage } from './pages/OrdenDetallePage'
-import { MisPedidosPage } from './pages/MisPedidosPage'
-import { CambiarPasswordPage } from './pages/CambiarPasswordPage'
-import { PagoPage } from './pages/PagoPage'
+import { Routes, Route } from "react-router-dom";
+import { Header } from "./components/layout/Header";
+import { ProtectedRoute } from "./routes/ProtectedRoute";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import MiCuentaPage from "./pages/MiCuentaPage";
+import RegistroPage from "./pages/RegistroPage";
+import { AuthBootstrap } from "./components/AuthBootstrap";
+import { ProductosPage } from "./pages/ProductosPage";
+import { ProductoDetallePage } from "./pages/ProductoDetallePage";
+import { CarritoPage } from "./pages/CarritoPage";
+import { CarritoItemsProvider } from "./context/CarritoItemsContext";
+import { CheckoutPage } from "./pages/CheckoutPage";
+import { OrdenDetallePage } from "./pages/OrdenDetallePage";
+import { MisPedidosPage } from "./pages/MisPedidosPage";
+import { CambiarPasswordPage } from "./pages/CambiarPasswordPage";
+import { PagoPage } from "./pages/PagoPage";
+import { AdminRoute } from "./components/admin/AdminRoute";
+import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 
 function App() {
   return (
@@ -33,6 +35,16 @@ function App() {
             <Route path="/cambiar-password" element={<CambiarPasswordPage />} />
             <Route path="/pagos/:ordenId" element={<PagoPage />} />
 
+            {/* Ruta protegida para admin */}
+            <Route
+              path="/admin-dashboard"
+              element={
+                <AdminRoute>
+                  <AdminDashboardPage />
+                </AdminRoute>
+              }
+            />
+
             <Route element={<ProtectedRoute />}>
               <Route path="/mi-cuenta" element={<MiCuentaPage />} />
               <Route path="/mis-pedidos" element={<MisPedidosPage />} />
@@ -43,7 +55,7 @@ function App() {
         </div>
       </div>
     </CarritoItemsProvider>
-  )
+  );
 }
 
-export default App
+export default App;
