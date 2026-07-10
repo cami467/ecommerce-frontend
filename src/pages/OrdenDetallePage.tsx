@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { obtenerOrdenPorId } from '../api/ordenes'
+import { obtenerPagoDeOrden } from '../api/pagos'
 import type { Orden } from '../types/orden'
+import type { Pago } from '../types/pago'
 import { AccountLayout } from '../layout/AccountLayout'
 
 function formatearGuaranies(valor: string | number | null | undefined) {
@@ -15,6 +17,9 @@ export function OrdenDetallePage() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
+  const [pago, setPago] = useState<Pago | null>(null)
+  const [cargandoPago, setCargandoPago] = useState(true)
+
   useEffect(() => {
     async function cargarOrden() {
       if (!id) {
@@ -26,6 +31,16 @@ export function OrdenDetallePage() {
       try {
         const data = await obtenerOrdenPorId(id)
         setOrden(data)
+
+        // cargar pago asociado
+        try {
+          const pagoEncontrado = await obtenerPagoDeOrden(id)
+          setPago(pagoEncontrado)
+        } catch {
+          setPago(null)
+        } finally {
+          setCargandoPago(false)
+        }
       } catch {
         setError('No se pudo cargar la orden.')
       } finally {
@@ -133,7 +148,6 @@ export function OrdenDetallePage() {
             </div>
           </div>
 
-          {/* Botón para pagar pedido */}
           <Link
             to={`/pagos/${orden.id}`}
             className="mt-4 block w-full rounded bg-green-600 px-4 py-3 text-center font-medium text-white hover:bg-green-700"
@@ -141,7 +155,6 @@ export function OrdenDetallePage() {
             Pagar pedido
           </Link>
 
-          {/* Botón para seguir comprando */}
           <Link
             to="/productos"
             className="mt-6 block w-full rounded bg-blue-600 px-4 py-3 text-center font-medium text-white hover:bg-blue-700"
@@ -149,6 +162,59 @@ export function OrdenDetallePage() {
             Seguir comprando
           </Link>
         </aside>
+      </section>
+
+      {/* Sección de pago */}
+      <section className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-bold text-gray-900">Pago</h2>
+
+        {cargandoPago ? (
+          <p className="mt-3 text-sm text-gray-500">
+            Cargando información del pago...
+          </p>
+        ) : pago ? (
+          <div className="mt-4 space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span>Método</span>
+              <span className="font-medium">{pago.pasarela_display}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Estado</span>
+              <span className="font-medium">{pago.estado_display}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Monto</span>
+              <span className="font-medium">
+                {formatearGuaranies(pago.monto)}
+              </span>
+            </div>
+
+            {pago.id_transaccion && (
+              <div className="flex justify-between">
+                <span>Transacción</span>
+                <span className="font-medium">{pago.id_transaccion}</span>
+              </div>
+            )}
+
+            {pago.estado === 'rejected' && (
+              <Link
+                to={`/pagos/${orden.id}`}
+                className="mt-4 block rounded bg-blue-600 px-4 py-2 text-center font-medium text-white hover:bg-blue-700"
+              >
+                Reintentar pago
+              </Link>
+            )}
+          </div>
+        ) : (
+          // Ya no repetimos el botón "Pagar pedido" acá: el de la
+          // tarjeta Resumen (arriba) es el único punto de entrada
+          // para iniciar el pago, evitando el botón duplicado.
+          <p className="mt-4 text-sm text-gray-600">
+            Esta orden todavía no tiene un pago registrado.
+          </p>
+        )}
       </section>
     </AccountLayout>
   )
