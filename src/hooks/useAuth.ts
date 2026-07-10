@@ -1,15 +1,15 @@
-// src/hooks/useAuth.ts
 import { useAuthStore } from "../store/authStore"
 import * as authApi from "../api/auth"
+import type { Usuario } from "../types/usuario"
 
 export function useAuth() {
   const accessToken = useAuthStore((state) => state.accessToken)
-  const usuario = useAuthStore((state) => state.usuario)
+  const usuario = useAuthStore((state) => state.usuario as Usuario | null)
   const inicializando = useAuthStore((state) => state.inicializando)
 
   const estaAutenticado = accessToken !== null
 
-  //  Función para refrescar el access token
+  // Función para refrescar el access token
   async function refreshAccessToken(): Promise<string | null> {
     const refresh = localStorage.getItem("refresh")
     if (!refresh) return null
@@ -27,7 +27,6 @@ export function useAuth() {
         useAuthStore.getState().setAccessToken(data.access)
         return data.access
       } else {
-        // si falla → cerrar sesión usando authApi.logout
         authApi.logout()
         return null
       }
@@ -37,7 +36,7 @@ export function useAuth() {
     }
   }
 
-  //  Función para hacer fetch con token y refresco automático
+  // Función para hacer fetch con token y refresco automático
   async function fetchConToken(url: string, options: RequestInit = {}) {
     let access = localStorage.getItem("access")
 
