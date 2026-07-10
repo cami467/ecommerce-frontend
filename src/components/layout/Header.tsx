@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useCarritoItems } from '../../context/CarritoItemsContext'
 import { useState } from 'react'
-
+import { NotificacionesDropdown } from '../notificaciones/NotificacionesDropdown' 
 export function Header() {
   const { estaAutenticado, usuario, logout } = useAuth()
   const navigate = useNavigate()
@@ -63,6 +63,9 @@ export function Header() {
             <Link to="/mis-pedidos" className="text-sm text-gray-700 hover:underline">
               Mis pedidos
             </Link>
+
+            {/*  Campana de notificaciones */}
+            <NotificacionesDropdown />
 
             <Link to="/carrito" className="relative flex items-center gap-2 text-sm text-gray-700 hover:underline">
               <span className="text-2xl">🛒</span>
