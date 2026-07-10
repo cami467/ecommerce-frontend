@@ -9,7 +9,7 @@ export function useAuth() {
 
   const estaAutenticado = accessToken !== null
 
-  // 🔑 Función para refrescar el access token
+  //  Función para refrescar el access token
   async function refreshAccessToken(): Promise<string | null> {
     const refresh = localStorage.getItem("refresh")
     if (!refresh) return null
@@ -37,7 +37,7 @@ export function useAuth() {
     }
   }
 
-  // 🔑 Función para hacer fetch con token y refresco automático
+  //  Función para hacer fetch con token y refresco automático
   async function fetchConToken(url: string, options: RequestInit = {}) {
     let access = localStorage.getItem("access")
 
@@ -76,6 +76,6 @@ export function useAuth() {
     registro: authApi.registro,
     inicializarSesion: authApi.inicializarSesion,
     refreshAccessToken,
-    fetchConToken, // 👉 ahora podés usar esto en tus páginas
+    fetchConToken, 
   }
 }
