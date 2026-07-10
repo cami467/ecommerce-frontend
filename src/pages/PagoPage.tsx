@@ -42,6 +42,32 @@ function obtenerEstiloEstadoPago(estado: string) {
   }
 }
 
+function obtenerPasosPago(estado: string) {
+  return [
+    {
+      label: 'Pedido creado',
+      completado: true,
+    },
+    {
+      label: 'Pago generado',
+      completado: true,
+    },
+    {
+      label: 'Esperando confirmación',
+      completado: estado !== 'approved' && estado !== 'rejected',
+    },
+    {
+      label:
+        estado === 'approved'
+          ? 'Pago aprobado'
+          : estado === 'rejected'
+            ? 'Pago rechazado'
+            : 'Resultado pendiente',
+      completado: estado === 'approved' || estado === 'rejected',
+    },
+  ]
+}
+
 export function PagoPage() {
   const { ordenId } = useParams()
   const [pasarela, setPasarela] = useState<PasarelaPago>('efectivo')
@@ -140,6 +166,40 @@ export function PagoPage() {
                       <h2 className="text-lg font-bold">{estadoVisual.titulo}</h2>
                       <p className="mt-1 text-sm">{estadoVisual.descripcion}</p>
                     </div>
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* Progreso del pago */}
+            {(() => {
+              const pasos = obtenerPasosPago(pago.estado)
+              return (
+                <div className="mt-6 rounded-lg border border-gray-200 bg-white p-4">
+                  <h3 className="font-semibold text-gray-900">Progreso del pago</h3>
+
+                  <div className="mt-4 space-y-3">
+                    {pasos.map((paso, index) => (
+                      <div key={paso.label} className="flex items-center gap-3">
+                        <div
+                          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                            paso.completado
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-200 text-gray-500'
+                          }`}
+                        >
+                          {index + 1}
+                        </div>
+
+                        <span
+                          className={`text-sm ${
+                            paso.completado ? 'font-medium text-gray-900' : 'text-gray-500'
+                          }`}
+                        >
+                          {paso.label}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )
