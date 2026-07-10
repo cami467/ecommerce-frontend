@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { obtenerOrdenPorId } from '../api/ordenes'
 import { obtenerPagoDeOrden } from '../api/pagos'
+import { descargarFactura } from '../api/facturas'
 import type { Orden } from '../types/orden'
 import type { Pago } from '../types/pago'
 import { AccountLayout } from '../layout/AccountLayout'
@@ -19,6 +20,9 @@ export function OrdenDetallePage() {
 
   const [pago, setPago] = useState<Pago | null>(null)
   const [cargandoPago, setCargandoPago] = useState(true)
+
+  const [descargandoFactura, setDescargandoFactura] = useState(false)
+  const [errorFactura, setErrorFactura] = useState('')
 
   useEffect(() => {
     async function cargarOrden() {
@@ -50,6 +54,23 @@ export function OrdenDetallePage() {
 
     cargarOrden()
   }, [id])
+
+  async function handleDescargarFactura() {
+    if (!orden) return
+
+    try {
+      setDescargandoFactura(true)
+      setErrorFactura('')
+
+      await descargarFactura(orden.id)
+    } catch {
+      setErrorFactura(
+        'No se pudo descargar la factura. Verificá que el pago esté aprobado.'
+      )
+    } finally {
+      setDescargandoFactura(false)
+    }
+  }
 
   if (cargando) {
     return (
@@ -216,6 +237,43 @@ export function OrdenDetallePage() {
           </p>
         )}
       </section>
+
+      {/* Sección de factura: solo tiene sentido descargarla si el
+          pago ya fue aprobado (coincide con la regla del backend,
+          que además exige que la orden esté confirmada o más
+          adelante en su ciclo de vida). */}
+      {pago?.estado === 'approved' ? (
+        <section className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900">
+            Factura
+          </h2>
+
+          <p className="mt-2 text-sm text-gray-600">
+            Descargá el comprobante electrónico correspondiente a esta orden.
+          </p>
+
+          {errorFactura && (
+            <div className="mt-4 rounded bg-red-50 p-3 text-sm text-red-700">
+              {errorFactura}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={handleDescargarFactura}
+            disabled={descargandoFactura}
+            className="mt-4 inline-flex items-center gap-2 rounded bg-slate-800 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            {descargandoFactura
+              ? 'Descargando factura...'
+              : '📄 Descargar factura PDF'}
+          </button>
+        </section>
+      ) : (
+        <p className="mt-3 text-sm text-gray-500">
+          La factura estará disponible cuando el pago sea aprobado.
+        </p>
+      )}
     </AccountLayout>
   )
 }
