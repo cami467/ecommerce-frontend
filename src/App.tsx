@@ -21,6 +21,7 @@ import { AdminProductosPage } from "./pages/admin/AdminProductosPage";
 import { AdminOrdenesPage } from "./pages/admin/AdminOrdenesPage";
 import { AdminPagosPage } from "./pages/admin/AdminPagosPage";
 import { AdminUsuariosPage } from "./pages/admin/AdminUsuariosPage";
+import { AdminProductoFormPage } from "./components/admin/AdminProductoFormPage";
 
 function App() {
   return (
@@ -54,6 +55,24 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminProductosPage />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin-dashboard/productos/nuevo"
+              element={
+                <AdminRoute>
+                  <AdminProductoFormPage />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin-dashboard/productos/:slug/editar"
+              element={
+                <AdminRoute>
+                  <AdminProductoFormPage />
                 </AdminRoute>
               }
             />

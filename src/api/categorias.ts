@@ -7,7 +7,7 @@ interface CategoriasResponse {
 }
 
 export async function obtenerCategorias(): Promise<Categoria[]> {
-  const response = await apiClient.get<Categoria[] | CategoriasResponse>('/categorias/')
+  const response = await apiClient.get<Categoria[] | CategoriasResponse>('productos/categorias/')
 
   if (Array.isArray(response.data)) {
     return response.data

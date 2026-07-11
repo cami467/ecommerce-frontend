@@ -1,34 +1,58 @@
-import { useEffect, useState } from 'react'
-import { AdminLayout } from '../../layout/AdminLayout'
-import { obtenerProductosAdmin } from '../../api/admin'
-import type { Producto } from '../../types/producto'
+import { useEffect, useState } from "react";
+import { AdminLayout } from "../../layout/AdminLayout";
+import { obtenerProductosAdmin } from "../../api/admin";
+import apiClient from "../../api/client";
+import type { Producto } from "../../types/producto";
+import { Link } from "react-router-dom";
 
 function formatearGuaranies(valor: string | number) {
-  return `Gs. ${Number(valor).toLocaleString('es-PY')}`
+  return `Gs. ${Number(valor).toLocaleString("es-PY")}`;
 }
 
 export function AdminProductosPage() {
-  const [productos, setProductos] = useState<Producto[]>([])
-  const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState('')
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
+  const [eliminando, setEliminando] = useState<string | null>(null);
 
   useEffect(() => {
     async function cargarProductos() {
       try {
-        setCargando(true)
-        setError('')
+        setCargando(true);
+        setError("");
 
-        const respuesta = await obtenerProductosAdmin()
-        setProductos(respuesta.resultados)
+        const respuesta = await obtenerProductosAdmin();
+        setProductos(respuesta.resultados);
       } catch {
-        setError('No se pudieron cargar los productos.')
+        setError("No se pudieron cargar los productos.");
       } finally {
-        setCargando(false)
+        setCargando(false);
       }
     }
 
-    cargarProductos()
-  }, [])
+    cargarProductos();
+  }, []);
+
+  async function handleEliminar(slug: string, nombre: string) {
+    const confirmado = window.confirm(
+      `¿Desactivar "${nombre}"? Ya no aparecerá en el catálogo, pero podés reactivarlo después.`
+    );
+    if (!confirmado) return;
+
+    try {
+      setEliminando(slug);
+      await apiClient.delete(`/productos/${slug}/`);
+      setProductos((actuales) =>
+        actuales.map((p) =>
+          p.slug === slug ? { ...p, esta_activo: false } : p
+        )
+      );
+    } catch {
+      alert("No se pudo desactivar el producto.");
+    } finally {
+      setEliminando(null);
+    }
+  }
 
   return (
     <AdminLayout>
@@ -43,18 +67,16 @@ export function AdminProductosPage() {
           </p>
         </div>
 
-        <button
-          type="button"
+        <Link
+          to="/admin-dashboard/productos/nuevo"
           className="rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
         >
           Nuevo producto
-        </button>
+        </Link>
       </header>
 
       {error && (
-        <div className="mt-6 rounded bg-red-50 p-4 text-red-700">
-          {error}
-        </div>
+        <div className="mt-6 rounded bg-red-50 p-4 text-red-700">{error}</div>
       )}
 
       <section className="mt-6 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -147,21 +169,36 @@ export function AdminProductosPage() {
                       <span
                         className={`rounded px-2 py-1 text-xs font-medium ${
                           producto.esta_activo
-                            ? 'bg-green-50 text-green-700'
-                            : 'bg-red-50 text-red-700'
+                            ? "bg-green-50 text-green-700"
+                            : "bg-red-50 text-red-700"
                         }`}
                       >
-                        {producto.esta_activo ? 'Activo' : 'Inactivo'}
+                        {producto.esta_activo ? "Activo" : "Inactivo"}
                       </span>
                     </td>
 
                     <td className="px-4 py-3 text-right">
-                      <button
-                        type="button"
-                        className="text-sm font-medium text-blue-600 hover:underline"
-                      >
-                        Editar
-                      </button>
+                      <div className="flex justify-end gap-3">
+                        <Link
+                          to={`/admin-dashboard/productos/${producto.slug}/editar`}
+                          className="text-sm font-medium text-blue-600 hover:underline"
+                        >
+                          Editar
+                        </Link>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleEliminar(producto.slug, producto.nombre)
+                          }
+                          disabled={eliminando === producto.slug}
+                          className="text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
+                        >
+                          {eliminando === producto.slug
+                            ? "Desactivando..."
+                            : "Desactivar"}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -171,5 +208,5 @@ export function AdminProductosPage() {
         )}
       </section>
     </AdminLayout>
-  )
+  );
 }

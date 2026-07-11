@@ -23,20 +23,29 @@ export interface VarianteProducto {
   esta_activo: boolean;
 }
 
+export interface CategoriaDetalleProducto {
+  id: string
+  nombre: string
+  slug: string
+  esta_activo: boolean
+}
+
 export interface Producto {
-  id: string;
-  nombre: string;
-  slug: string;
-  categoria_nombre: string;
-  precio_base: string;
-  porcentaje_descuento: string;
-  precio_con_descuento: string;
-  tasa_iva: string;
-  monto_iva_incluido: string;
-  imagen_principal: string | null;
-  es_destacado: boolean;
-  esta_activo: boolean;
-  variante_unica_id: string | null;
+  id: string
+  nombre: string
+  slug: string
+  categoria_nombre: string
+  categoria_detalle?: CategoriaDetalleProducto
+  descripcion?: string
+  precio_base: string
+  porcentaje_descuento: string
+  precio_con_descuento: string
+  tasa_iva: string
+  monto_iva_incluido: string
+  imagen_principal: string | null
+  es_destacado: boolean
+  esta_activo: boolean
+  imagenes?: ProductoImagen[]
   variantes?: VarianteProducto[]
 }
 
