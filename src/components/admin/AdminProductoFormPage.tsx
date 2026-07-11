@@ -3,15 +3,21 @@ import { isAxiosError } from 'axios'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   actualizarProducto,
+  actualizarVariante,
   crearProducto,
   crearVariante,
   obtenerProductoAdminPorSlug,
-  subirImagenProducto,
   type ProductoPayload,
 } from '../../api/admin'
 import { obtenerCategorias } from '../../api/categorias'
 import { AdminLayout } from '../../layout/AdminLayout'
+import { VariantesProductoAdmin } from '../../components/admin/VariantesProductoAdmin'
+import { ImagenesProductoAdmin } from './ImagenesProductoAdmin'
 import type { Categoria } from '../../types/categoria'
+import type {
+  ProductoImagen,
+  ProductoVariante,
+} from '../../types/producto'
 
 interface ErroresBackend {
   [campo: string]: string[] | string | undefined
@@ -37,6 +43,10 @@ export function AdminProductoFormPage() {
 
   const [categorias, setCategorias] = useState<Categoria[]>([])
 
+  const [productoId, setProductoId] = useState('')
+  const [variantes, setVariantes] = useState<ProductoVariante[]>([])
+  const [imagenes, setImagenes] = useState<ProductoImagen[]>([])
+
   const [nombre, setNombre] = useState('')
   const [categoria, setCategoria] = useState('')
   const [descripcion, setDescripcion] = useState('')
@@ -46,12 +56,16 @@ export function AdminProductoFormPage() {
   const [esDestacado, setEsDestacado] = useState(false)
   const [estaActivo, setEstaActivo] = useState(true)
 
-  // Solo aplican en modo creación: producto sin variante no tiene stock,
-  // y sin al menos una imagen se ve vacío en el catálogo.
-  const [imagenArchivo, setImagenArchivo] = useState<File | null>(null)
-  const [varianteNombre, setVarianteNombre] = useState('Único')
-  const [varianteSku, setVarianteSku] = useState('')
-  const [varianteInventario, setVarianteInventario] = useState('0')
+  // Variante única: si el producto no maneja talles/colores,
+  // se puede cargar el SKU/inventario directamente acá y se
+  // crea (o actualiza) esa única variante al guardar el producto.
+  const [esVarianteUnica, setEsVarianteUnica] = useState(false)
+  const [varianteUnicaId, setVarianteUnicaId] = useState<
+    string | null
+  >(null)
+  const [skuUnico, setSkuUnico] = useState('')
+  const [inventarioUnico, setInventarioUnico] = useState('0')
+  const [stockMinimoUnico, setStockMinimoUnico] = useState('0')
 
   const [cargando, setCargando] = useState(esEdicion)
   const [guardando, setGuardando] = useState(false)
@@ -72,12 +86,24 @@ export function AdminProductoFormPage() {
         if (slug) {
           const producto = await obtenerProductoAdminPorSlug(slug)
 
+          setProductoId(producto.id)
+          setVariantes(producto.variantes ?? [])
+          setImagenes(producto.imagenes ?? [])
+
+          const variantesDelProducto = producto.variantes ?? []
+
+          if (variantesDelProducto.length === 1) {
+            const unica = variantesDelProducto[0]
+
+            setEsVarianteUnica(true)
+            setVarianteUnicaId(unica.id)
+            setSkuUnico(unica.sku)
+            setInventarioUnico(String(unica.inventario))
+            setStockMinimoUnico(String(unica.stock_minimo))
+          }
+
           setNombre(producto.nombre ?? '')
-          setCategoria(
-            producto.categoria_detalle?.slug ??
-              producto.categoria_nombre ??
-              ''
-          )
+          setCategoria(producto.categoria_detalle?.slug ?? '')
           setDescripcion(producto.descripcion ?? '')
           setPrecioBase(String(producto.precio_base ?? ''))
           setPorcentajeDescuento(
@@ -129,24 +155,23 @@ export function AdminProductoFormPage() {
         'El descuento debe estar entre 0 y 90.'
     }
 
-    // La variante inicial solo es obligatoria al crear. En edición
-    // el stock se maneja aparte, desde la lista de variantes.
-    if (!esEdicion) {
-      if (!varianteSku.trim()) {
-        errores.variante_sku = 'El SKU es obligatorio.'
-      } else if (!/^[A-Za-z0-9-]+$/.test(varianteSku.trim())) {
-        errores.variante_sku =
-          'El SKU solo permite letras, números y guiones.'
+    if (esVarianteUnica) {
+      if (!skuUnico.trim()) {
+        errores.sku_unico =
+          'El SKU es obligatorio para la variante única.'
       }
 
-      const inventario = Number(varianteInventario)
-      if (
-        varianteInventario === '' ||
-        Number.isNaN(inventario) ||
-        inventario < 0
-      ) {
-        errores.variante_inventario =
-          'El inventario debe ser 0 o mayor.'
+      const inventario = Number(inventarioUnico)
+      const stockMinimo = Number(stockMinimoUnico)
+
+      if (Number.isNaN(inventario) || inventario < 0) {
+        errores.inventario_unico =
+          'El inventario no puede ser negativo.'
+      }
+
+      if (Number.isNaN(stockMinimo) || stockMinimo < 0) {
+        errores.stock_minimo_unico =
+          'El stock mínimo no puede ser negativo.'
       }
     }
 
@@ -156,29 +181,14 @@ export function AdminProductoFormPage() {
     categoria,
     precioBase,
     porcentajeDescuento,
-    esEdicion,
-    varianteSku,
-    varianteInventario,
+    esVarianteUnica,
+    skuUnico,
+    inventarioUnico,
+    stockMinimoUnico,
   ])
 
   const formularioValido =
     Object.keys(erroresLocales).length === 0
-
-  function handleArchivoSeleccionado(
-    event: React.ChangeEvent<HTMLInputElement>
-  ) {
-    const archivo = event.target.files?.[0] ?? null
-
-    if (archivo && archivo.size > 5 * 1024 * 1024) {
-      setErrorGeneral('La imagen no puede superar los 5 MB.')
-      event.target.value = ''
-      setImagenArchivo(null)
-      return
-    }
-
-    setErrorGeneral('')
-    setImagenArchivo(archivo)
-  }
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
@@ -203,29 +213,35 @@ export function AdminProductoFormPage() {
         esta_activo: estaActivo,
       }
 
-      if (slug) {
-        await actualizarProducto(slug, payload)
-      } else {
-        // El producto se crea primero: recién con su id se pueden
-        // subir la imagen y crear la variante, porque ambos endpoints
-        // los piden como referencia.
-        const productoCreado = await crearProducto(payload)
+      let idGuardado = productoId
 
-        if (imagenArchivo) {
-          await subirImagenProducto(
-            productoCreado.id,
-            imagenArchivo,
-            true
-          )
+      if (slug) {
+        const actualizado = await actualizarProducto(slug, payload)
+        idGuardado = actualizado.id
+      } else {
+        const creado = await crearProducto(payload)
+        idGuardado = creado.id
+      }
+
+      if (esVarianteUnica) {
+        const datosVariante = {
+          nombre: 'Único',
+          sku: skuUnico.trim().toUpperCase(),
+          modificador_precio: 0,
+          inventario: Number(inventarioUnico),
+          stock_minimo: Number(stockMinimoUnico),
+          atributos: {},
+          esta_activo: true,
         }
 
-        await crearVariante({
-          producto: productoCreado.id,
-          nombre: varianteNombre.trim() || 'Único',
-          sku: varianteSku.trim().toUpperCase(),
-          inventario: Number(varianteInventario),
-          esta_activo: true,
-        })
+        if (varianteUnicaId) {
+          await actualizarVariante(varianteUnicaId, datosVariante)
+        } else {
+          await crearVariante({
+            producto: idGuardado,
+            ...datosVariante,
+          })
+        }
       }
 
       navigate('/admin-dashboard/productos')
@@ -517,120 +533,110 @@ export function AdminProductoFormPage() {
             </label>
           </div>
 
-          {!esEdicion && (
-            <>
-              <div className="border-t pt-5">
-                <label
-                  htmlFor="imagen"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Imagen del producto
-                </label>
+          <div className="border-t pt-5">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <input
+                type="checkbox"
+                checked={esVarianteUnica}
+                onChange={(event) =>
+                  setEsVarianteUnica(event.target.checked)
+                }
+                disabled={variantes.length > 1}
+              />
+              Este producto tiene una sola variante (sin talles ni
+              colores)
+            </label>
 
-                <input
-                  id="imagen"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleArchivoSeleccionado}
-                  className="mt-1 block w-full text-sm text-gray-600"
-                />
+            {variantes.length > 1 && (
+              <p className="mt-1 text-xs text-gray-500">
+                Este producto ya tiene múltiples variantes cargadas.
+                Gestionalas en la sección de abajo.
+              </p>
+            )}
 
-                <p className="mt-1 text-xs text-gray-500">
-                  Opcional al crear, máximo 5 MB. Se puede agregar después desde la edición.
-                </p>
+            {esVarianteUnica && (
+              <div className="mt-3 grid gap-4 sm:grid-cols-3">
+                <div>
+                  <label
+                    htmlFor="sku-unico"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    SKU
+                  </label>
 
-                {imagenArchivo && (
-                  <img
-                    src={URL.createObjectURL(imagenArchivo)}
-                    alt="Previsualización"
-                    className="mt-2 h-24 w-24 rounded object-cover"
+                  <input
+                    id="sku-unico"
+                    value={skuUnico}
+                    onChange={(event) =>
+                      setSkuUnico(
+                        event.target.value.toUpperCase()
+                      )
+                    }
+                    placeholder="ZAP-RUN-42"
+                    className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
                   />
-                )}
-              </div>
 
-              <div className="border-t pt-5">
-                <h2 className="text-sm font-semibold text-gray-800">
-                  Stock inicial
-                </h2>
+                  {erroresLocales.sku_unico && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {erroresLocales.sku_unico}
+                    </p>
+                  )}
+                </div>
 
-                <p className="mt-1 text-xs text-gray-500">
-                  El stock se maneja por variante. Esta es la primera; podés agregar más después desde el detalle del producto.
-                </p>
+                <div>
+                  <label
+                    htmlFor="inventario-unico"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Inventario
+                  </label>
 
-                <div className="mt-3 grid gap-4 sm:grid-cols-3">
-                  <div>
-                    <label
-                      htmlFor="variante-nombre"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Nombre de la variante
-                    </label>
+                  <input
+                    id="inventario-unico"
+                    type="number"
+                    min="0"
+                    value={inventarioUnico}
+                    onChange={(event) =>
+                      setInventarioUnico(event.target.value)
+                    }
+                    className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+                  />
 
-                    <input
-                      id="variante-nombre"
-                      value={varianteNombre}
-                      onChange={(event) =>
-                        setVarianteNombre(event.target.value)
-                      }
-                      placeholder="Único, Talle M, Rojo..."
-                      className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-                    />
-                  </div>
+                  {erroresLocales.inventario_unico && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {erroresLocales.inventario_unico}
+                    </p>
+                  )}
+                </div>
 
-                  <div>
-                    <label
-                      htmlFor="variante-sku"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      SKU
-                    </label>
+                <div>
+                  <label
+                    htmlFor="stock-minimo-unico"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Stock mínimo
+                  </label>
 
-                    <input
-                      id="variante-sku"
-                      value={varianteSku}
-                      onChange={(event) =>
-                        setVarianteSku(event.target.value)
-                      }
-                      placeholder="CAM-FUT-M"
-                      className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-                    />
+                  <input
+                    id="stock-minimo-unico"
+                    type="number"
+                    min="0"
+                    value={stockMinimoUnico}
+                    onChange={(event) =>
+                      setStockMinimoUnico(event.target.value)
+                    }
+                    className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+                  />
 
-                    {erroresLocales.variante_sku && (
-                      <p className="mt-1 text-xs text-red-600">
-                        {erroresLocales.variante_sku}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="variante-inventario"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Inventario
-                    </label>
-
-                    <input
-                      id="variante-inventario"
-                      type="number"
-                      min="0"
-                      value={varianteInventario}
-                      onChange={(event) =>
-                        setVarianteInventario(event.target.value)
-                      }
-                      className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-                    />
-
-                    {erroresLocales.variante_inventario && (
-                      <p className="mt-1 text-xs text-red-600">
-                        {erroresLocales.variante_inventario}
-                      </p>
-                    )}
-                  </div>
+                  {erroresLocales.stock_minimo_unico && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {erroresLocales.stock_minimo_unico}
+                    </p>
+                  )}
                 </div>
               </div>
-            </>
-          )}
+            )}
+          </div>
 
           <div className="flex gap-3 border-t pt-5">
             <button
@@ -653,6 +659,31 @@ export function AdminProductoFormPage() {
             </Link>
           </div>
         </form>
+
+        {esEdicion && productoId !== '' && (
+          <>
+            {!esVarianteUnica && (
+              <VariantesProductoAdmin
+                productoId={productoId}
+                variantesIniciales={variantes}
+                onActualizar={setVariantes}
+              />
+            )}
+
+            <ImagenesProductoAdmin
+              productoId={productoId}
+              imagenesIniciales={imagenes}
+              onActualizar={setImagenes}
+            />
+          </>
+        )}
+
+        {!esEdicion && (
+          <p className="mt-6 text-center text-sm text-gray-500">
+            Después de crear el producto vas a poder subir imágenes
+            y, si corresponde, gestionar variantes múltiples.
+          </p>
+        )}
       </div>
     </AdminLayout>
   )
