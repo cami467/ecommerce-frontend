@@ -17,6 +17,10 @@ import { CambiarPasswordPage } from "./pages/CambiarPasswordPage";
 import { PagoPage } from "./pages/PagoPage";
 import { AdminRoute } from "./components/admin/AdminRoute";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
+import { AdminProductosPage } from "./pages/admin/AdminProductosPage";
+import { AdminOrdenesPage } from "./pages/admin/AdminOrdenesPage";
+import { AdminPagosPage } from "./pages/admin/AdminPagosPage";
+import { AdminUsuariosPage } from "./pages/admin/AdminUsuariosPage";
 
 function App() {
   return (
@@ -41,6 +45,42 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminDashboardPage />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin-dashboard/productos"
+              element={
+                <AdminRoute>
+                  <AdminProductosPage />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin-dashboard/ordenes"
+              element={
+                <AdminRoute>
+                  <AdminOrdenesPage />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin-dashboard/pagos"
+              element={
+                <AdminRoute>
+                  <AdminPagosPage />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin-dashboard/usuarios"
+              element={
+                <AdminRoute>
+                  <AdminUsuariosPage />
                 </AdminRoute>
               }
             />
