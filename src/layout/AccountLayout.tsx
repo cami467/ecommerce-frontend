@@ -1,50 +1,70 @@
-import { useState, type ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
+import type { ReactNode } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { AccountSidebar, type SidebarItem } from '../components/account/AccountSidebar'
 import { useAuth } from '../hooks/useAuth'
-import { AccountSidebar } from '../components/account/AccountSidebar'
-
-type Seccion = 'perfil' | 'pedidos'| "password"  | 'catalogo'
 
 interface AccountLayoutProps {
   children: ReactNode
-  seccionActiva: Seccion
 }
 
-export function AccountLayout({
-  children,
-  seccionActiva,
-}: AccountLayoutProps) {
+export function AccountLayout({ children }: AccountLayoutProps) {
   const { usuario, logout } = useAuth()
   const navigate = useNavigate()
-
-  // El estado "expandido" vive acá, no en cada página. Así todas las
-  // páginas que usan AccountLayout (MiCuenta, MisPedidos, OrdenDetalle...)
-  // comparten la misma lógica de hover del sidebar sin repetir código.
-  const [expandido, setExpandido] = useState(false)
+  const location = useLocation()
 
   async function handleLogout() {
     await logout()
     navigate('/login')
   }
 
-  const nombre = usuario?.nombre_completo || usuario?.email || 'Usuario'
+  const nombre =
+    usuario?.nombre_completo ||
+    usuario?.email ||
+    'Usuario'
+
+  const items: SidebarItem[] = [
+    {
+      to: '/mi-cuenta',
+      icono: '👤',
+      label: 'Perfil',
+      activo: location.pathname === '/mi-cuenta',
+    },
+    {
+      to: '/mis-pedidos',
+      icono: '📦',
+      label: 'Mis pedidos',
+      activo:
+        location.pathname === '/mis-pedidos' ||
+        location.pathname.startsWith('/ordenes/'),
+    },
+    {
+      to: '/cambiar-password',
+      icono: '🔒',
+      label: 'Cambiar contraseña',
+      activo: location.pathname === '/cambiar-password',
+    },
+    {
+      to: '/productos',
+      icono: '🛍️',
+      label: 'Catálogo',
+      activo: location.pathname === '/productos',
+    },
+  ]
 
   return (
-    // "flex" real: el sidebar (sticky, shrink-0) y el <main> (flex-1)
-    // se reparten el ancho automáticamente. Nada de margin-left fijo,
-    // que se desincroniza cada vez que el sidebar cambia de w-20 a w-56.
-    <div className="flex min-h-screen">
+    <div className="flex flex-1">
       <AccountSidebar
         nombreUsuario={nombre}
-        avatar={usuario?.avatar ?? undefined}
-        seccionActiva={seccionActiva}
+        avatar={usuario?.avatar || undefined}
+        subtitulo="Mi cuenta"
+        items={items}
         onLogout={handleLogout}
-        expandido={expandido}
-        setExpandido={setExpandido}
       />
 
-      <main className="min-w-0 flex-1 bg-gray-50 px-8 py-8">
-        <div className="mx-auto max-w-6xl">{children}</div>
+      <main className="flex-1 px-6 py-8">
+        <div className="mx-auto w-full max-w-6xl">
+          {children}
+        </div>
       </main>
     </div>
   )

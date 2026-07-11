@@ -74,15 +74,19 @@ export function OrdenDetallePage() {
 
   if (cargando) {
     return (
-      <AccountLayout seccionActiva="pedidos">
-        <p className="text-gray-600">Cargando orden...</p>
+      <AccountLayout>
+        <div className="h-24 animate-pulse rounded-lg bg-gray-100" />
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
+          <div className="h-64 animate-pulse rounded-lg border bg-gray-100" />
+          <div className="h-64 animate-pulse rounded-lg border bg-gray-100" />
+        </div>
       </AccountLayout>
     )
   }
 
   if (error || !orden) {
     return (
-      <AccountLayout seccionActiva="pedidos">
+      <AccountLayout>
         <div className="rounded bg-red-50 p-4 text-red-700">
           {error || 'Orden no encontrada.'}
         </div>
@@ -91,7 +95,7 @@ export function OrdenDetallePage() {
   }
 
   return (
-    <AccountLayout seccionActiva="pedidos">
+    <AccountLayout>
       <div className="rounded-lg bg-green-50 p-5 text-green-800">
         <h1 className="text-2xl font-bold">Pedido confirmado</h1>
         <p className="mt-1">

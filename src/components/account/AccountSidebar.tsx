@@ -1,75 +1,67 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
+import { useState } from 'react'
 
-type SeccionActiva = "perfil" | "pedidos" | "password" | "catalogo";
+export interface SidebarItem {
+  to: string
+  icono: string
+  label: string
+  activo?: boolean
+}
 
 interface AccountSidebarProps {
-  nombreUsuario: string;
-  avatar?: string;
-  seccionActiva: SeccionActiva;
-  onLogout: () => void;
-  expandido: boolean;
-  setExpandido: (valor: boolean) => void;
+  nombreUsuario: string
+  subtitulo?: string
+  avatar?: string
+  items: SidebarItem[]
+  onLogout: () => void
 }
 
 function ItemMenu({
   to,
   icono,
   label,
-  activo,
+  activo = false,
   expandido,
-}: {
-  to: string;
-  icono: string;
-  label: string;
-  activo: boolean;
-  expandido: boolean;
-}) {
+}: SidebarItem & { expandido: boolean }) {
   return (
     <Link
       to={to}
+      title={!expandido ? label : undefined}
       className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
         activo
-          ? "bg-blue-100 text-blue-700 font-medium"
-          : "text-gray-600 hover:bg-gray-100 hover:text-blue-600"
+          ? 'bg-blue-100 font-medium text-blue-700'
+          : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'
       }`}
     >
       <span
-        className={`flex h-7 w-7 items-center justify-center rounded-md text-base ${
-          activo ? "bg-blue-200 text-blue-700" : "bg-gray-200 text-gray-500"
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-base ${
+          activo
+            ? 'bg-blue-200 text-blue-700'
+            : 'bg-gray-200 text-gray-500'
         }`}
       >
         {icono}
       </span>
-
-      {expandido && <span className="whitespace-nowrap">{label}</span>}
+      {expandido && <span>{label}</span>}
     </Link>
-  );
+  )
 }
 
 export function AccountSidebar({
   nombreUsuario,
+  subtitulo = 'Mi cuenta',
   avatar,
-  seccionActiva,
+  items,
   onLogout,
-  expandido,
-  setExpandido,
 }: AccountSidebarProps) {
+  const [expandido, setExpandido] = useState(false)
+
   return (
     <aside
       onMouseEnter={() => setExpandido(true)}
       onMouseLeave={() => setExpandido(false)}
-      // IMPORTANTE:
-      // - "sticky top-0" en vez de "fixed top-16": así el sidebar se
-      //   comporta como un elemento normal hasta que el scroll lo hace
-      //   "chocar" contra el borde superior, momento en el que se pega
-      //   ahí. No depende de la altura del header ni deja espacios en
-      //   blanco cuando el header desaparece del viewport.
-      // - "h-screen" para que siempre ocupe el alto completo de la
-      //   ventana mientras está pegado arriba.
-      // - "shrink-0" para que, dentro del flex del layout padre, el
-      //   sidebar nunca se achique cuando el contenido principal crece.
       className={`sticky top-0 z-40 flex h-screen shrink-0 flex-col overflow-hidden border-r border-gray-200 bg-white shadow-sm transition-all duration-300 ${
-        expandido ? "w-56" : "w-20"
+        expandido ? 'w-56' : 'w-20'
       }`}
     >
       <div className="flex items-center gap-3 border-b border-gray-200 px-5 py-5">
@@ -84,11 +76,10 @@ export function AccountSidebar({
             {nombreUsuario.charAt(0).toUpperCase()}
           </div>
         )}
-
         {expandido && (
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">{nombreUsuario}</p>
-            <p className="text-xs text-gray-500">Mi cuenta</p>
+            <p className="text-xs text-gray-500">{subtitulo}</p>
           </div>
         )}
       </div>
@@ -99,39 +90,10 @@ export function AccountSidebar({
             Menú
           </p>
         )}
-
         <nav className="space-y-1">
-          <ItemMenu
-            to="/mi-cuenta"
-            icono="👤"
-            label="Perfil"
-            activo={seccionActiva === "perfil"}
-            expandido={expandido}
-          />
-
-          <ItemMenu
-            to="/mis-pedidos"
-            icono="📦"
-            label="Mis pedidos"
-            activo={seccionActiva === "pedidos"}
-            expandido={expandido}
-          />
-
-          <ItemMenu
-            to="/productos"
-            icono="🛍️"
-            label="Catálogo"
-            activo={seccionActiva === "catalogo"}
-            expandido={expandido}
-          />
-
-          <ItemMenu
-            to="/cambiar-password"
-            icono="🔒"
-            label="Cambiar contraseña"
-            activo={seccionActiva === "password"}
-            expandido={expandido}
-          />
+          {items.map((item) => (
+            <ItemMenu key={item.to} {...item} expandido={expandido} />
+          ))}
         </nav>
       </div>
 
@@ -141,21 +103,18 @@ export function AccountSidebar({
             Cuenta
           </p>
         )}
-
         <button
           type="button"
           onClick={onLogout}
+          title={!expandido ? 'Cerrar sesión' : undefined}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-red-600 transition hover:bg-red-50"
         >
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-red-100 text-base">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-red-100 text-base">
             🚪
           </span>
-
-          {expandido && (
-            <span className="whitespace-nowrap">Cerrar sesión</span>
-          )}
+          {expandido && <span>Cerrar sesión</span>}
         </button>
       </div>
     </aside>
-  );
+  )
 }

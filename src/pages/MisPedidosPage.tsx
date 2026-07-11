@@ -38,16 +38,25 @@ export function MisPedidosPage() {
 
   if (cargando) {
     return (
-      <AccountLayout seccionActiva="pedidos">
-        <p className="text-gray-600">Cargando pedidos...</p>
+      <AccountLayout>
+        <h1 className="text-2xl font-bold text-gray-900">Mis pedidos</h1>
+        <div className="mt-6 space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="h-28 animate-pulse rounded-lg border border-gray-200 bg-gray-100"
+            />
+          ))}
+        </div>
       </AccountLayout>
     )
   }
 
   if (error) {
     return (
-      <AccountLayout seccionActiva="pedidos">
-        <div className="rounded bg-red-50 p-4 text-red-700">
+      <AccountLayout>
+        <h1 className="text-2xl font-bold text-gray-900">Mis pedidos</h1>
+        <div className="mt-6 rounded bg-red-50 p-4 text-red-700">
           {error}
         </div>
       </AccountLayout>
@@ -55,7 +64,7 @@ export function MisPedidosPage() {
   }
 
   return (
-    <AccountLayout seccionActiva="pedidos">
+    <AccountLayout>
       <h1 className="text-2xl font-bold text-gray-900">Mis pedidos</h1>
 
       {ordenes.length === 0 ? (

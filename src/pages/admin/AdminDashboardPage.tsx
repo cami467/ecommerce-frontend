@@ -3,6 +3,7 @@ import {
   obtenerOrdenesAdmin,
   obtenerPagosAdmin,
   obtenerProductosAdmin,
+  obtenerUsuariosAdmin,
 } from '../../api/admin'
 import { AdminLayout } from '../../layout/AdminLayout'
 import type { Orden } from '../../types/orden'
@@ -20,6 +21,7 @@ export function AdminDashboardPage() {
   const [totalOrdenes, setTotalOrdenes] = useState(0)
   const [totalPagos, setTotalPagos] = useState(0)
   const [totalProductos, setTotalProductos] = useState(0)
+  const [totalUsuarios, setTotalUsuarios] = useState(0)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
@@ -33,10 +35,12 @@ export function AdminDashboardPage() {
           respuestaOrdenes,
           respuestaPagos,
           respuestaProductos,
+          respuestaUsuarios,
         ] = await Promise.all([
           obtenerOrdenesAdmin(),
           obtenerPagosAdmin(),
           obtenerProductosAdmin(),
+          obtenerUsuariosAdmin(),
         ])
 
         setOrdenes(respuestaOrdenes.resultados)
@@ -45,6 +49,7 @@ export function AdminDashboardPage() {
         setTotalOrdenes(respuestaOrdenes.total)
         setTotalPagos(respuestaPagos.total)
         setTotalProductos(respuestaProductos.total)
+        setTotalUsuarios(respuestaUsuarios.total)
       } catch {
         setError(
           'No se pudieron cargar los datos del panel administrativo.'
@@ -78,9 +83,28 @@ export function AdminDashboardPage() {
   if (cargando) {
     return (
       <AdminLayout>
-        <p className="text-gray-600">
-          Cargando panel administrativo...
-        </p>
+        <header>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Dashboard administrativo
+          </h1>
+          <p className="mt-1 text-sm text-gray-600">
+            Resumen general del e-commerce.
+          </p>
+        </header>
+
+        <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="h-[92px] animate-pulse rounded-lg border bg-gray-100 p-5 shadow-sm"
+            />
+          ))}
+        </section>
+
+        <section className="mt-8 grid gap-6 lg:grid-cols-2">
+          <div className="h-72 animate-pulse rounded-lg border bg-gray-100 p-5 shadow-sm" />
+          <div className="h-72 animate-pulse rounded-lg border bg-gray-100 p-5 shadow-sm" />
+        </section>
       </AdminLayout>
     )
   }
@@ -138,6 +162,14 @@ export function AdminDashboardPage() {
           </p>
           <p className="mt-1 text-xs text-gray-500">
             {productosActivos} activos
+          </p>
+        </div>
+
+        <div className="rounded-lg border bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Usuarios registrados</p>
+
+          <p className="mt-2 text-2xl font-bold text-gray-900">
+            {totalUsuarios}
           </p>
         </div>
       </section>

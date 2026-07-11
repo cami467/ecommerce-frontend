@@ -66,7 +66,7 @@ export function CambiarPasswordPage() {
   }
 
   return (
-    <AccountLayout seccionActiva="password">
+    <AccountLayout>
       <h1 className="text-2xl font-bold mb-6">Cambiar contraseña</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
