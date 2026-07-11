@@ -54,3 +54,25 @@ export async function obtenerProductosAdmin() {
 
   return extraerResultados(response.data)
 }
+
+export interface UsuarioAdmin {
+  id: number
+  email: string
+  first_name: string
+  last_name: string
+  nombre_completo: string
+  telefono: string | null
+  avatar: string | null
+  is_active: boolean
+  is_staff: boolean
+  date_joined: string
+  last_login: string | null
+}
+
+export async function obtenerUsuariosAdmin() {
+  const response = await apiClient.get<
+    UsuarioAdmin[] | RespuestaPaginada<UsuarioAdmin>
+  >('/usuarios/')
+
+  return extraerResultados(response.data)
+}
