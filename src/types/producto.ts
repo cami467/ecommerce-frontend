@@ -13,14 +13,18 @@ export interface ProductoImagen {
   orden: number;
 }
 
-export interface VarianteProducto {
-  id: string;
-  nombre: string;
-  sku: string;
-  precio_total: string;
-  inventario: number;
-  tiene_stock: boolean;
-  esta_activo: boolean;
+export interface ProductoVariante {
+  id: string
+  producto: string
+  nombre: string
+  sku: string
+  modificador_precio: string
+  precio_total?: string
+  inventario: number
+  stock_minimo: number
+  atributos: Record<string, string>
+  tiene_stock?: boolean
+  esta_activo: boolean
 }
 
 export interface CategoriaDetalleProducto {
@@ -46,7 +50,7 @@ export interface Producto {
   es_destacado: boolean
   esta_activo: boolean
   imagenes?: ProductoImagen[]
-  variantes?: VarianteProducto[]
+  variantes?: ProductoVariante[]
 }
 
 export interface ProductoDetalle {
@@ -62,7 +66,7 @@ export interface ProductoDetalle {
   tasa_iva: string;
   monto_iva_incluido: string;
   es_destacado: boolean;
-  variantes: VarianteProducto[];
+  variantes: ProductoVariante[];
   imagenes: ProductoImagen[];
   esta_activo: boolean;
   fecha_creacion: string;
