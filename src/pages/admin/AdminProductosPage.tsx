@@ -15,14 +15,20 @@ export function AdminProductosPage() {
   const [error, setError] = useState("");
   const [eliminando, setEliminando] = useState<string | null>(null);
 
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
+  const [totalProductos, setTotalProductos] = useState(0);
+
   useEffect(() => {
     async function cargarProductos() {
       try {
         setCargando(true);
         setError("");
 
-        const respuesta = await obtenerProductosAdmin();
+        const respuesta = await obtenerProductosAdmin(paginaActual);
         setProductos(respuesta.resultados);
+        setTotalPaginas(respuesta.paginas);
+        setTotalProductos(respuesta.total);
       } catch {
         setError("No se pudieron cargar los productos.");
       } finally {
@@ -31,7 +37,15 @@ export function AdminProductosPage() {
     }
 
     cargarProductos();
-  }, []);
+  }, [paginaActual]);
+
+  function irAPaginaAnterior() {
+    setPaginaActual((actual) => Math.max(1, actual - 1));
+  }
+
+  function irAPaginaSiguiente() {
+    setPaginaActual((actual) => Math.min(totalPaginas, actual + 1));
+  }
 
   async function handleEliminar(slug: string, nombre: string) {
     const confirmado = window.confirm(
@@ -204,6 +218,33 @@ export function AdminProductosPage() {
                 ))}
               </tbody>
             </table>
+
+            <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 px-4 py-4 sm:flex-row">
+              <p className="text-sm text-gray-600">
+                Mostrando página {paginaActual} de {totalPaginas} (
+                {totalProductos} productos en total)
+              </p>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={irAPaginaAnterior}
+                  disabled={paginaActual === 1}
+                  className="rounded border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  ← Anterior
+                </button>
+
+                <button
+                  type="button"
+                  onClick={irAPaginaSiguiente}
+                  disabled={paginaActual === totalPaginas}
+                  className="rounded border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Siguiente →
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </section>

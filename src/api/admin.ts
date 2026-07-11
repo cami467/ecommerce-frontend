@@ -1,11 +1,19 @@
 import apiClient from './client'
 import type { Orden } from '../types/orden'
 import type { Pago } from '../types/pago'
-import type { Producto } from '../types/producto'
+import type {
+  Producto,
+  ProductoImagen,
+  ProductoVariante,
+} from '../types/producto'
 
 interface RespuestaPaginada<T> {
   total?: number
   count?: number
+  paginas?: number
+  pagina_actual?: number
+  siguiente?: string | null
+  anterior?: string | null
   resultados?: T[]
   results?: T[]
 }
@@ -15,11 +23,19 @@ function extraerResultados<T>(
 ): {
   total: number
   resultados: T[]
+  paginas: number
+  paginaActual: number
+  siguiente: string | null
+  anterior: string | null
 } {
   if (Array.isArray(data)) {
     return {
       total: data.length,
       resultados: data,
+      paginas: 1,
+      paginaActual: 1,
+      siguiente: null,
+      anterior: null,
     }
   }
 
@@ -28,6 +44,10 @@ function extraerResultados<T>(
   return {
     total: data.total ?? data.count ?? resultados.length,
     resultados,
+    paginas: data.paginas ?? 1,
+    paginaActual: data.pagina_actual ?? 1,
+    siguiente: data.siguiente ?? null,
+    anterior: data.anterior ?? null,
   }
 }
 
@@ -47,10 +67,12 @@ export async function obtenerPagosAdmin() {
   return extraerResultados(response.data)
 }
 
-export async function obtenerProductosAdmin() {
+export async function obtenerProductosAdmin(pagina = 1) {
   const response = await apiClient.get<
     Producto[] | RespuestaPaginada<Producto>
-  >('/productos/')
+  >('/productos/', {
+    params: { page: pagina },
+  })
 
   return extraerResultados(response.data)
 }
@@ -121,35 +143,79 @@ export async function obtenerProductoAdminPorSlug(
   return response.data
 }
 
+// ---------------- IMÁGENES ----------------
+
 export async function subirImagenProducto(
   productoId: string,
   archivo: File,
   esPrincipal = true
-): Promise<void> {
+): Promise<ProductoImagen> {
   const formData = new FormData()
   formData.append('producto', productoId)
   formData.append('imagen', archivo)
   formData.append('es_principal', String(esPrincipal))
 
-  // No se pasa Content-Type a mano: el navegador arma el boundary
-  // del multipart solo. Si el apiClient fuerza JSON por default,
-  await apiClient.post('/productos/imagenes/', formData, {
-  })
+  const response = await apiClient.post<ProductoImagen>(
+    '/productos/imagenes/',
+    formData
+  )
+
+  return response.data
 }
 
-export interface VariantePayload {
-  producto: string
+export async function eliminarImagenProducto(
+  imagenId: string
+): Promise<void> {
+  await apiClient.delete(`/productos/imagenes/${imagenId}/`)
+}
+
+export async function marcarImagenPrincipal(
+  imagenId: string
+): Promise<{ mensaje: string }> {
+  const response = await apiClient.patch<{ mensaje: string }>(
+    `/productos/imagenes/${imagenId}/marcar-principal/`
+  )
+
+  return response.data
+}
+
+// ---------------- VARIANTES ----------------
+
+export interface VarianteBasePayload {
   nombre: string
   sku: string
-  modificador_precio?: number
+  modificador_precio: number
   inventario: number
-  stock_minimo?: number
-  atributos?: Record<string, string>
-  esta_activo?: boolean
+  stock_minimo: number
+  atributos: Record<string, string>
+  esta_activo: boolean
 }
 
+export interface CrearVariantePayload extends VarianteBasePayload {
+  producto: string
+}
+
+export type ActualizarVariantePayload = Partial<VarianteBasePayload>
+
 export async function crearVariante(
-  payload: VariantePayload
-): Promise<void> {
-  await apiClient.post('/productos/variantes/', payload)
+  payload: CrearVariantePayload
+): Promise<ProductoVariante> {
+  const response = await apiClient.post<ProductoVariante>(
+    '/productos/variantes/',
+    payload
+  )
+
+  return response.data
+}
+
+export async function actualizarVariante(
+  varianteId: string,
+  payload: ActualizarVariantePayload
+): Promise<ProductoVariante> {
+  const response = await apiClient.patch<ProductoVariante>(
+    `/productos/variantes/${varianteId}/`,
+    payload
+  )
+
+  return response.data
 }
