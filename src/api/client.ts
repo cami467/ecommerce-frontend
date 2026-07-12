@@ -20,10 +20,32 @@ apiClient.interceptors.request.use((config) => {
 // ------------------------------------------------------------------
 // MANEJO DE REFRESH: evita que multiples requests en paralelo
 // disparen multiples refrescos simultaneos del token.
+//
+// IMPORTANTE: esta es la UNICA funcion que debe canjear el refresh
+// token en toda la app. Como el backend usa ROTATE_REFRESH_TOKENS +
+// BLACKLIST_AFTER_ROTATION, el refresh token es de un solo uso: si
+// dos lugares distintos (por ejemplo este interceptor y
+// AuthBootstrap) leen el mismo token y cada uno intenta canjearlo
+// por su cuenta, el segundo llega tarde con un token ya invalidado
+// y termina borrando la sesion que el primero acababa de establecer.
+// Por eso refrescarAccessToken() se exporta y se reutiliza tambien
+// desde api/auth.ts, en vez de que cada lado tenga su propia copia.
 // ------------------------------------------------------------------
 let refreshPromise: Promise<string | null> | null = null;
 
-async function refrescarAccessToken(): Promise<string | null> {
+export async function refrescarAccessToken(): Promise<string | null> {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = ejecutarRefresh().finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
+}
+
+async function ejecutarRefresh(): Promise<string | null> {
   const refreshToken = tokenStorage.getRefreshToken();
 
   if (!refreshToken) {
@@ -75,13 +97,7 @@ apiClient.interceptors.response.use(
 
     originalRequest._retry = true;
 
-    if (!refreshPromise) {
-      refreshPromise = refrescarAccessToken().finally(() => {
-        refreshPromise = null;
-      });
-    }
-
-    const nuevoAccessToken = await refreshPromise;
+    const nuevoAccessToken = await refrescarAccessToken();
 
     if (!nuevoAccessToken) {
       useAuthStore.getState().logout();

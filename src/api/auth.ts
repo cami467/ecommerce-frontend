@@ -1,4 +1,4 @@
-import apiClient from "./client";
+import apiClient, { refrescarAccessToken } from "./client";
 import { tokenStorage } from "./tokenStorage";
 import { useAuthStore, type Usuario } from "../store/authStore";
 
@@ -11,11 +11,6 @@ interface LoginResponse {
   access: string;
   refresh: string;
   usuario: Usuario;
-}
-
-interface RefreshResponse {
-  access: string;
-  refresh?: string;
 }
 
 interface RegistroDatos {
@@ -63,13 +58,16 @@ export async function actualizarPerfil(payload: ActualizarPerfilPayload) {
 // ------------------------------------------------------------------
 // CANDADO PARA inicializarSesion(): evita que dos llamadas en paralelo
 // (ej. React StrictMode invocando el useEffect de AuthBootstrap dos
-// veces al montar) lean el MISMO refresh token y ambas intenten
-// canjearlo. Como el backend usa ROTATE_REFRESH_TOKENS +
-// BLACKLIST_AFTER_ROTATION, el refresh token es de un solo uso: la
-// primera llamada lo canjea con éxito y la segunda, al llegar tarde
-// con el mismo token ya invalidado, fallaba y BORRABA la sesión
-// recién obtenida por la primera. Con este candado, la segunda
-// llamada simplemente espera y reutiliza el resultado de la primera.
+// veces al montar) disparen dos ejecuciones completas de esta función.
+//
+// El canje del refresh token en sí ya no se hace acá: se delega a
+// refrescarAccessToken() de api/client.ts, que es la ÚNICA función
+// de toda la app que le pega a /token/refresh/. Así, si en el mismo
+// instante el interceptor de un 401 también necesita refrescar
+// (por ejemplo, porque PagoResultadoPage disparó un fetch antes de
+// que la sesión terminara de restaurarse), ambos caminos comparten
+// el mismo candado y el mismo resultado, en vez de canjear el mismo
+// refresh token dos veces por separado.
 // ------------------------------------------------------------------
 let inicializarSesionPromise: Promise<void> | null = null;
 
@@ -94,17 +92,10 @@ async function ejecutarInicializarSesion(): Promise<void> {
   }
 
   try {
-    const refreshResponse = await apiClient.post<RefreshResponse>(
-      "/token/refresh/",
-      { refresh: refreshToken }
-    );
+    const nuevoAccessToken = await refrescarAccessToken();
 
-    const { access, refresh } = refreshResponse.data;
-
-    useAuthStore.getState().setAccessToken(access);
-
-    if (refresh) {
-      tokenStorage.setRefreshToken(refresh);
+    if (!nuevoAccessToken) {
+      throw new Error("No se pudo refrescar la sesión.");
     }
 
     const perfilResponse = await apiClient.get<Usuario>("/usuarios/perfil/");
