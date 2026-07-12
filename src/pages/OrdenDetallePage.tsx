@@ -173,12 +173,44 @@ export function OrdenDetallePage() {
             </div>
           </div>
 
-          <Link
-            to={`/pagos/${orden.id}`}
-            className="mt-4 block w-full rounded bg-green-600 px-4 py-3 text-center font-medium text-white hover:bg-green-700"
-          >
-            Pagar pedido
-          </Link>
+          {/* Botón de estado de pago: cambia según el estado real del
+              pago, para no dejar que se intente pagar dos veces una
+              orden ya abonada. */}
+          {cargandoPago ? (
+            <button
+              type="button"
+              disabled
+              className="mt-4 block w-full rounded bg-gray-300 px-4 py-3 text-center font-medium text-gray-600"
+            >
+              Verificando pago...
+            </button>
+          ) : pago?.estado === 'approved' ? (
+            <div className="mt-4 flex w-full items-center justify-center gap-2 rounded bg-green-100 px-4 py-3 font-semibold text-green-700">
+              <span>✓</span>
+              Pedido pagado
+            </div>
+          ) : pago?.estado === 'pending' ? (
+            <Link
+              to={`/pagos/${orden.id}`}
+              className="mt-4 block w-full rounded bg-yellow-500 px-4 py-3 text-center font-medium text-white hover:bg-yellow-600"
+            >
+              Pago pendiente
+            </Link>
+          ) : pago?.estado === 'rejected' ? (
+            <Link
+              to={`/pagos/${orden.id}`}
+              className="mt-4 block w-full rounded bg-red-600 px-4 py-3 text-center font-medium text-white hover:bg-red-700"
+            >
+              Reintentar pago
+            </Link>
+          ) : (
+            <Link
+              to={`/pagos/${orden.id}`}
+              className="mt-4 block w-full rounded bg-green-600 px-4 py-3 text-center font-medium text-white hover:bg-green-700"
+            >
+              Pagar pedido
+            </Link>
+          )}
 
           <Link
             to="/productos"
@@ -204,9 +236,21 @@ export function OrdenDetallePage() {
               <span className="font-medium">{pago.pasarela_display}</span>
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex items-center justify-between">
               <span>Estado</span>
-              <span className="font-medium">{pago.estado_display}</span>
+              <span
+                className={`rounded px-2 py-1 text-xs font-semibold ${
+                  pago.estado === 'approved'
+                    ? 'bg-green-100 text-green-700'
+                    : pago.estado === 'pending'
+                      ? 'bg-yellow-100 text-yellow-700'
+                      : pago.estado === 'rejected'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                {pago.estado_display}
+              </span>
             </div>
 
             <div className="flex justify-between">
@@ -221,15 +265,6 @@ export function OrdenDetallePage() {
                 <span>Transacción</span>
                 <span className="font-medium">{pago.id_transaccion}</span>
               </div>
-            )}
-
-            {pago.estado === 'rejected' && (
-              <Link
-                to={`/pagos/${orden.id}`}
-                className="mt-4 block rounded bg-blue-600 px-4 py-2 text-center font-medium text-white hover:bg-blue-700"
-              >
-                Reintentar pago
-              </Link>
             )}
           </div>
         ) : (
@@ -248,13 +283,21 @@ export function OrdenDetallePage() {
           adelante en su ciclo de vida). */}
       {pago?.estado === 'approved' ? (
         <section className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-bold text-gray-900">
-            Factura
-          </h2>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">
+                Factura disponible
+              </h2>
 
-          <p className="mt-2 text-sm text-gray-600">
-            Descargá el comprobante electrónico correspondiente a esta orden.
-          </p>
+              <p className="mt-1 text-sm text-gray-600">
+                El pago fue aprobado y el comprobante ya puede descargarse.
+              </p>
+            </div>
+
+            <span className="rounded bg-green-100 px-2 py-1 text-xs font-semibold text-green-700">
+              Emitida
+            </span>
+          </div>
 
           {errorFactura && (
             <div className="mt-4 rounded bg-red-50 p-3 text-sm text-red-700">
@@ -266,10 +309,10 @@ export function OrdenDetallePage() {
             type="button"
             onClick={handleDescargarFactura}
             disabled={descargandoFactura}
-            className="mt-4 inline-flex items-center gap-2 rounded bg-slate-800 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-gray-300"
+            className="mt-4 rounded bg-slate-800 px-4 py-2 font-medium text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-gray-300"
           >
             {descargandoFactura
-              ? 'Descargando factura...'
+              ? 'Descargando...'
               : '📄 Descargar factura PDF'}
           </button>
         </section>
