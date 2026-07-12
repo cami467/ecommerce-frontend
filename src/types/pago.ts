@@ -23,6 +23,10 @@ export interface Pago {
   es_reembolsable: boolean
   monto: number
   id_transaccion: string | null
+  
+  comprobante_url?: string | null
+  referencia_cliente?: string
+  observacion_cliente?: string
   fecha_procesado: string | null
   fecha_creacion: string
 }

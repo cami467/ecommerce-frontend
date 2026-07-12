@@ -22,6 +22,7 @@ import { AdminOrdenesPage } from "./pages/admin/AdminOrdenesPage";
 import { AdminPagosPage } from "./pages/admin/AdminPagosPage";
 import { AdminUsuariosPage } from "./pages/admin/AdminUsuariosPage";
 import { AdminProductoFormPage } from "./components/admin/AdminProductoFormPage";
+import { PagoResultadoPage } from './pages/PagoResultadoPage';
 
 function App() {
   return (
@@ -38,7 +39,15 @@ function App() {
             <Route path="/productos/:slug" element={<ProductoDetallePage />} />
             <Route path="/carrito" element={<CarritoPage />} />
             <Route path="/cambiar-password" element={<CambiarPasswordPage />} />
-            <Route path="/pagos/:ordenId" element={<PagoPage />} />
+
+            {/* PagoResultadoPage queda pública a propósito: Stripe
+                redirige acá desde su propio dominio después de 3D
+                Secure, y en ese punto el navegador todavía puede no
+                haber restaurado la sesión (por ejemplo, si el JWT
+                vive solo en memoria). La página solo consulta el
+                estado de un pago puntual por su UUID, no expone
+                nada sensible del usuario. */}
+            <Route path="/pagos/resultado" element={<PagoResultadoPage />} />
 
             {/* Ruta protegida para admin */}
             <Route
@@ -109,6 +118,7 @@ function App() {
               <Route path="/mis-pedidos" element={<MisPedidosPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/ordenes/:id" element={<OrdenDetallePage />} />
+              <Route path="/pagos/:ordenId" element={<PagoPage />} />
             </Route>
           </Routes>
         </div>
