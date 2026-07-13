@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { obtenerPerfil } from '../api/auth'
 import {
   normalizeSpaces,
@@ -7,8 +8,11 @@ import {
 } from '../utils/validators'
 import apiClient from '../api/client'
 import { AccountLayout } from '../layout/AccountLayout'
+import { useAuth } from '../hooks/useAuth'
 
 function MiCuentaPage() {
+  const { usuario } = useAuth()
+
   const [email, setEmail] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -40,6 +44,12 @@ function MiCuentaPage() {
 
     cargarPerfil()
   }, [])
+
+  // Un admin no debería ver la experiencia de cliente: lo mandamos
+  // a su propia página de perfil dentro del panel de administración.
+  if (usuario?.is_staff) {
+    return <Navigate to="/admin-dashboard/perfil" replace />
+  }
 
   const errorNombre = firstName
     ? validatePersonName(firstName, 'El nombre')
