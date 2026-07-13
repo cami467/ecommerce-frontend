@@ -1,5 +1,5 @@
 export interface Categoria {
-  id: string
+  id: number
   nombre: string
   slug: string
   esta_activo: boolean

@@ -24,6 +24,8 @@ import { AdminUsuariosPage } from "./pages/admin/AdminUsuariosPage";
 import { AdminProductoFormPage } from "./components/admin/AdminProductoFormPage";
 import { PagoResultadoPage } from "./pages/PagoResultadoPage";
 import { AdminEstadisticasPage } from "./pages/admin/AdminEstadisticasPage";
+import { ResumenCuentaPage } from "./pages/ResumenCuentaPage";
+import { AdminPerfilPage } from "./pages/admin/AdminPerfilPage";
 
 function App() {
   return (
@@ -123,8 +125,21 @@ function App() {
               }
             />
 
+            <Route
+              path="/admin-dashboard/perfil"
+              element={
+                <AdminRoute>
+                  <AdminPerfilPage />
+                </AdminRoute>
+              }
+            />
+
             <Route element={<ProtectedRoute />}>
               <Route path="/mi-cuenta" element={<MiCuentaPage />} />
+              <Route
+                path="/mi-cuenta/resumen"
+                element={<ResumenCuentaPage />}
+              />
               <Route path="/mis-pedidos" element={<MisPedidosPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/ordenes/:id" element={<OrdenDetallePage />} />

@@ -54,6 +54,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       activo: location.pathname.startsWith("/admin-dashboard/usuarios"),
     },
     {
+      to: "/admin-dashboard/perfil",
+      icono: "👤",
+      label: "Mi perfil",
+      activo: location.pathname === "/admin-dashboard/perfil",
+    },
+    {
       to: "/productos",
       icono: "🏪",
       label: "Volver a la tienda",

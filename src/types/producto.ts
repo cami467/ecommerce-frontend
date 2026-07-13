@@ -1,9 +1,4 @@
-export interface Categoria {
-  id: number;
-  nombre: string;
-  slug: string;
-  esta_activo: boolean;
-}
+import type { Categoria } from './categoria'
 
 export interface ProductoImagen {
   id: string;
@@ -27,19 +22,12 @@ export interface ProductoVariante {
   esta_activo: boolean
 }
 
-export interface CategoriaDetalleProducto {
-  id: string
-  nombre: string
-  slug: string
-  esta_activo: boolean
-}
-
 export interface Producto {
   id: string
   nombre: string
   slug: string
   categoria_nombre: string
-  categoria_detalle?: CategoriaDetalleProducto
+  categoria_detalle?: Categoria
   descripcion?: string
   precio_base: string
   porcentaje_descuento: string

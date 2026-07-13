@@ -1,17 +1,23 @@
-import  apiClient  from './client'
+import apiClient from './client'
 import type { Categoria } from '../types/categoria'
 
 interface CategoriasResponse {
-  resultados?: Categoria[]
-  results?: Categoria[]
+  total: number
+  paginas: number
+  pagina_actual: number
+  siguiente: string | null
+  anterior: string | null
+  resultados: Categoria[]
 }
 
 export async function obtenerCategorias(): Promise<Categoria[]> {
-  const response = await apiClient.get<Categoria[] | CategoriasResponse>('productos/categorias/')
+  const response = await apiClient.get<CategoriasResponse | Categoria[]>(
+    '/productos/categorias/'
+  )
 
   if (Array.isArray(response.data)) {
     return response.data
   }
 
-  return response.data.resultados ?? response.data.results ?? []
+  return response.data.resultados
 }

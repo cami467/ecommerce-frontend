@@ -25,3 +25,7 @@ export async function obtenerProductoPorSlug(slug: string): Promise<ProductoDeta
   return response.data
 }
 
+export async function obtenerProductosDestacados(): Promise<Producto[]> {
+  const response = await apiClient.get<ProductosResponse>('/productos/destacados/')
+  return response.data.resultados
+}
