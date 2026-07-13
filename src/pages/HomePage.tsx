@@ -59,7 +59,7 @@ function TarjetaProducto({
           </div>
         )}
 
-        <div className="absolute inset-0 flex items-end bg-gradient-to-t from-[#16231C]/70 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100">
+        <div className="absolute inset-0 flex items-end bg-linear-to-t from-[#16231C]/70 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100">
           <span className="translate-y-3 p-5 text-sm font-semibold text-white transition duration-300 group-hover:translate-y-0">
             Ver producto →
           </span>
@@ -353,13 +353,13 @@ function HomePage() {
 
             <div className="relative">
               {!scrollCategorias.inicio && (
-                <div className="pointer-events-none absolute bottom-2 left-0 top-0 z-10 w-14 bg-gradient-to-r from-[#F5F6F1] to-transparent" />
+                <div className="absolute inset-0 flex items-end bg-linear-to-t from-[#16231C]/70 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
               )}
 
               <div
                 ref={categoriasRef}
                 onScroll={manejarScrollCategorias}
-                className="flex snap-x gap-3 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="flex snap-x gap-3 overflow-x-auto pb-3 scrollbar-non"
               >
                 {categorias.map((categoria) => (
                   <Link
@@ -373,7 +373,7 @@ function HomePage() {
               </div>
 
               {!scrollCategorias.fin && (
-                <div className="pointer-events-none absolute bottom-2 right-0 top-0 z-10 w-14 bg-gradient-to-l from-[#F5F6F1] to-transparent" />
+                <div className="absolute inset-0 flex items-end bg-linear-to-t from-[#16231C]/70 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
               )}
             </div>
           </div>
