@@ -22,7 +22,8 @@ import { AdminOrdenesPage } from "./pages/admin/AdminOrdenesPage";
 import { AdminPagosPage } from "./pages/admin/AdminPagosPage";
 import { AdminUsuariosPage } from "./pages/admin/AdminUsuariosPage";
 import { AdminProductoFormPage } from "./components/admin/AdminProductoFormPage";
-import { PagoResultadoPage } from './pages/PagoResultadoPage';
+import { PagoResultadoPage } from "./pages/PagoResultadoPage";
+import { AdminEstadisticasPage } from "./pages/admin/AdminEstadisticasPage";
 
 function App() {
   return (
@@ -109,6 +110,15 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminUsuariosPage />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin-dashboard/estadisticas"
+              element={
+                <AdminRoute>
+                  <AdminEstadisticasPage />
                 </AdminRoute>
               }
             />

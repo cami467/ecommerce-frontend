@@ -7,6 +7,8 @@ import type {
   ProductoVariante,
 } from '../types/producto'
 
+import type { EstadisticasAdmin } from '../types/estadisticas'
+
 interface RespuestaPaginada<T> {
   total?: number
   count?: number
@@ -215,6 +217,14 @@ export async function actualizarVariante(
   const response = await apiClient.patch<ProductoVariante>(
     `/productos/variantes/${varianteId}/`,
     payload
+  )
+
+  return response.data
+}
+
+export async function obtenerEstadisticasAdmin(): Promise<EstadisticasAdmin> {
+  const response = await apiClient.get<EstadisticasAdmin>(
+    '/admin/estadisticas/'
   )
 
   return response.data
