@@ -16,6 +16,11 @@ import {
 import { obtenerEstadisticasAdmin } from '../../api/admin'
 import { AdminLayout } from '../../layout/AdminLayout'
 import type { EstadisticasAdmin } from '../../types/estadisticas'
+import {
+  exportarEstadisticasCsv,
+  exportarEstadisticasExcel,
+  exportarEstadisticasPdf,
+} from '../../utils/exportarEstadisticas'
 
 const INTERVALO_ACTUALIZACION = 30_000
 
@@ -205,7 +210,7 @@ export function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <header className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
             Dashboard administrativo
@@ -230,20 +235,47 @@ export function AdminDashboardPage() {
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => cargarEstadisticas(true)}
-          disabled={actualizando}
-          className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <span className={actualizando ? 'animate-spin' : ''}>
-            ↻
-          </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            disabled={actualizando}
+            onClick={() => exportarEstadisticasCsv(estadisticas)}
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            ⬇ Exportar CSV
+          </button>
 
-          {actualizando
-            ? 'Actualizando...'
-            : 'Actualizar datos'}
-        </button>
+          <button
+            type="button"
+            disabled={actualizando}
+            onClick={() => exportarEstadisticasExcel(estadisticas)}
+            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            ⬇ Exportar Excel
+          </button>
+
+          <button
+            type="button"
+            disabled={actualizando}
+            onClick={() => exportarEstadisticasPdf(estadisticas)}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            ⬇ Exportar PDF
+          </button>
+
+          <button
+            type="button"
+            onClick={() => cargarEstadisticas(true)}
+            disabled={actualizando}
+            className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <span className={actualizando ? 'animate-spin' : ''}>
+              ↻
+            </span>
+
+            {actualizando ? 'Actualizando...' : 'Actualizar'}
+          </button>
+        </div>
       </header>
 
       {error && (
