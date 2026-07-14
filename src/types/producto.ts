@@ -39,6 +39,7 @@ export interface Producto {
   esta_activo: boolean
   imagenes?: ProductoImagen[]
   variantes?: ProductoVariante[]
+  variante_unica_id?: string | null
 }
 
 export interface ProductoDetalle {

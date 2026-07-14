@@ -1,4 +1,4 @@
-import type { VarianteProducto } from './producto'
+import type { ProductoVariante } from "./producto"
 
 export interface CarritoItem {
   id: string
@@ -7,7 +7,7 @@ export interface CarritoItem {
   variante_nombre: string
   imagen_producto: string | null
   precio_unitario: string
-  variante_detalle: VarianteProducto
+  variante_detalle: ProductoVariante
   cantidad: number
   subtotal: string
   esta_activo: boolean
