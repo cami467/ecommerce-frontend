@@ -1,4 +1,3 @@
-<img width="1363" height="720" alt="Captura de pantalla 2026-07-29 214208" src="https://github.com/user-attachments/assets/10218cc6-c878-474a-99d0-a3a3a2cbdd30" />
 # E-Commerce Frontend
 
 Cliente web (SPA) para consumir la API REST del backend de e-commerce desarrollado en Django REST Framework.
@@ -44,9 +43,6 @@ VITE_API_URL=http://127.0.0.1:8000/api
    \`\`\`
 3. Abrir `http://localhost:5173`
 
+<img width="1363" height="720" alt="Captura de pantalla 2026-07-29 214208" src="https://github.com/user-attachments/assets/10218cc6-c878-474a-99d0-a3a3a2cbdd30" />
 
 
-
-## Estado del proyecto
-
-En desarrollo.
