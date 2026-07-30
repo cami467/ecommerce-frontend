@@ -45,4 +45,4 @@ VITE_API_URL=http://127.0.0.1:8000/api
 
 <img width="1363" height="720" alt="Captura de pantalla 2026-07-29 214208" src="https://github.com/user-attachments/assets/10218cc6-c878-474a-99d0-a3a3a2cbdd30" />
 
-
+<img width="1366" height="768" alt="2" src="https://github.com/user-attachments/assets/fc06b6c5-78fd-4433-8e3f-3cf4b567ab10" />
