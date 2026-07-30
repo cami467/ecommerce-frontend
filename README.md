@@ -46,9 +46,9 @@ VITE_API_URL=http://127.0.0.1:8000/api
 4.  Proyecto E‑commerce  
 [Ver proyecto desplegado en Render](https://ecommerce-frontend-zt6i.onrender.com)
 
-<img width="1366" height="768" alt="43" src="https://github.com/user-attachments/assets/7531503e-6080-4b1d-b0ae-2269115bb388" />
-
 <img width="1366" height="768" alt="42" src="https://github.com/user-attachments/assets/0a3ddc3c-b1e5-4737-8789-66f63c879538" />
+
+<img width="1366" height="768" alt="43" src="https://github.com/user-attachments/assets/7531503e-6080-4b1d-b0ae-2269115bb388" />
 
 <img width="1366" height="768" alt="44" src="https://github.com/user-attachments/assets/fefaa7bb-70c6-4b94-a0b4-8d26f3046070" />
 
