@@ -43,6 +43,21 @@ VITE_API_URL=http://127.0.0.1:8000/api
    npm run dev
    \`\`\`
 3. Abrir `http://localhost:5173`
+4.  Proyecto E‑commerce  
+[Ver proyecto desplegado en Render](https://ecommerce-frontend-zt6i.onrender.com)
+
+<img width="1366" height="768" alt="43" src="https://github.com/user-attachments/assets/7531503e-6080-4b1d-b0ae-2269115bb388" />
+
+<img width="1366" height="768" alt="42" src="https://github.com/user-attachments/assets/0a3ddc3c-b1e5-4737-8789-66f63c879538" />
+
+<img width="1366" height="768" alt="44" src="https://github.com/user-attachments/assets/fefaa7bb-70c6-4b94-a0b4-8d26f3046070" />
+
+<img width="1366" height="768" alt="45" src="https://github.com/user-attachments/assets/7e13c848-3a74-4e93-9377-d66f4b56dfd8" />
+
+<img width="1366" height="768" alt="46" src="https://github.com/user-attachments/assets/c1a95c71-a76f-4c2e-abef-b42a4260c43b" />
+
+<img width="1366" height="768" alt="47" src="https://github.com/user-attachments/assets/0cf5517d-15b3-45c2-a8fc-eeac2341688d" />
+
 
 <img width="1363" height="720" alt="Captura de pantalla 2026-07-29 214208" src="https://github.com/user-attachments/assets/10218cc6-c878-474a-99d0-a3a3a2cbdd30" />
 
