@@ -58,12 +58,10 @@ VITE_API_URL=http://127.0.0.1:8000/api
 
 <img width="1366" height="768" alt="47" src="https://github.com/user-attachments/assets/0cf5517d-15b3-45c2-a8fc-eeac2341688d" />
 
-
-<img width="1363" height="720" alt="Captura de pantalla 2026-07-29 214208" src="https://github.com/user-attachments/assets/10218cc6-c878-474a-99d0-a3a3a2cbdd30" />
+<img width="1366" height="768" alt="2" src="https://github.com/user-attachments/assets/fc06b6c5-78fd-4433-8e3f-3cf4b567ab10" />
 
 <img width="1366" height="768" alt="41" src="https://github.com/user-attachments/assets/7bf57624-9dad-4ff7-bf9e-e3aa7fbc2aa3" />
 
-<img width="1366" height="768" alt="2" src="https://github.com/user-attachments/assets/fc06b6c5-78fd-4433-8e3f-3cf4b567ab10" />
 
 <img width="1366" height="768" alt="Captura de pantalla 3" src="https://github.com/user-attachments/assets/cdd78748-0c46-4bea-b681-3420869ac73a" />
 
